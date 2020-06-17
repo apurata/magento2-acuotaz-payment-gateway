@@ -11,11 +11,12 @@ use Magento\Framework\Webapi\Exception;
 use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\ObjectManager;
+use Magento\Checkout\Model\Cart;
 
 class Generate extends Action
 {
-    const MAGENTO_CHECKOUT_URL = 'checkout/#payment';
-    const MAGENTO_CHECKOUT_FINISH_URL = 'checkout/onepage/success/';
+    const FINANCING_FAIL_URL = 'checkout/#payment';
+    const FINANCING_SUCCESS_URL = 'apurata_financing/order/create/quote_id/';
     const MAGENTO_ORDERS_URL = 'sales/order/history/';
 
 
@@ -49,7 +50,8 @@ class Generate extends Action
         Context $context,
         LoggerInterface $logger,
         CustomerSession $customerSession,
-        CheckoutSession $checkoutSession
+        CheckoutSession $checkoutSession,
+        Cart $cart
     ) {
         parent::__construct($context);
 
@@ -57,7 +59,7 @@ class Generate extends Action
         $this->customerSession = $customerSession;
         $this->checkoutSession = $checkoutSession;
         $this->objectManager = ObjectManager::getInstance();
-        $this->cart = $this->objectManager->get('\Magento\Checkout\Model\Cart');
+        $this->cart = $cart;
     }
 
     /**
@@ -76,20 +78,33 @@ class Generate extends Action
      */
     public function execute()
     {
+        $quote = $this->cart->getQuote();
+        $storeManager = $this->objectManager->create("\Magento\Store\Model\StoreManagerInterface");
+        $storeId = $quote->getStoreId();
+        $stores = $storeManager->getStores(true, false);
+        $storeName = '';
+        foreach($stores as $store){                
+            if($store->getId() == $storeId){
+                echo 'sucess';
+                $storeName = $store->getName();
+            }
+        }
+
         $customer = $this->customerSession->getCustomer();
 
         $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
 
         $response->setData(['financingIntent' => [
                 'order_id' => urlencode($this->cart->getQuote()->getId() . $this->customerSession->getCustomer()->getEmail()),
+                'pos_client_id' => urlencode($storeName),
                 'amount' => urlencode($this->cart->getQuote()->getGrandTotal()),
-                'url_redir_on_canceled' => urlencode(self::MAGENTO_CHECKOUT_URL),
-                'url_redir_on_rejected' => urlencode(self::MAGENTO_CHECKOUT_URL),
-                'url_redir_on_success' => urlencode(self::MAGENTO_CHECKOUT_FINISH_URL),
+                'url_redir_on_canceled' => urlencode(self::FINANCING_FAIL_URL),
+                'url_redir_on_rejected' => urlencode(self::FINANCING_FAIL_URL),
+                'url_redir_on_success' => urlencode(self::FINANCING_SUCCESS_URL),
                 'customer_data__email' => urlencode($this->customerSession->getCustomer()->getEmail()),
                 'customer_data__phone' => urlencode($this->getCustomerPhone($customer)),
                 'customer_data__billing_first_name' => urlencode($this->customerSession->getCustomer()->getFirstname()),
-                'customer_data__billing_last_name' => urlencode($this->customerSession->getCustomer()->getlastname()),
+                'customer_data__billing_last_name' => urlencode($this->customerSession->getCustomer()->getlastname())
             ]]);
         return $response;
     }
