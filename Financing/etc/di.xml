@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!-- Configuration reader -->
+    <type name="Apurata\Financing\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Apurata\Financing\Model\Ui\ConfigProvider::CODE</argument>
+        </arguments>
+    </type>
+
+</config>
