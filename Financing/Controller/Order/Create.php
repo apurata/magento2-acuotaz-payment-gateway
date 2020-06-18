@@ -8,7 +8,9 @@ use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Webapi\Exception;
 use Magento\Quote\Model\QuoteFactory;
+use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Quote\Api\CartManagementInterface;
+use Magento\Checkout\Model\Cart;
 
 class Create extends Action
 {
@@ -18,17 +20,34 @@ class Create extends Action
     private $quoteFactory;
 
     /**
+     * @var CheckoutSession
+     */
+    private $checkoutSession;
+
+    /**
+     * @var cart
+     */
+    private $cart;
+
+    /**
      * @param Context $context
+     * @param CheckoutSession $checkoutSession
      */
     public function __construct(
         Context $context,
         QuoteFactory $quoteFactory,
-        CartManagementInterface $cartManagementInterface
+        CartManagementInterface $cartManagementInterface,
+        CheckoutSession $checkoutSession,
+        Cart $cart,
+        \Magento\Sales\Model\Order $order
     ) {
         parent::__construct($context);
-
+        
+        $this->checkoutSession = $checkoutSession;
         $this->quoteFactory = $quoteFactory;
         $this->cartManagementInterface = $cartManagementInterface;
+        $this->cart = $cart;
+        $this->order = $order;
     }
 
     /**
@@ -36,7 +55,7 @@ class Create extends Action
      */
     public function execute()
     {      
-        $quoteId = $this->getRequest()->getParam('quoteId');
+        $quoteId = $this->getRequest()->getParam('quote_id');
 
         $quote = $this->quoteFactory->create()->load($quoteId);
         $quote->setPaymentMethod('apurata_financing');
@@ -51,15 +70,27 @@ class Create extends Action
         
         $order->setEmailSent(0);
         $increment_id = $order->getRealOrderId();
-        if($order->getEntityId()){
+
+        if($order->getEntityId())
+        {
             $result['order_id']= $order->getRealOrderId();
-        }else{
+            
+            // Clear cart
+            $objectManager = \Magento\Framework\App\ObjectManager::getInstance(); 
+            $cartObject = $objectManager->create('Magento\Checkout\Model\Cart')->truncate(); 
+            $cartObject->saveQuote();
+
+            //redirect ty page
+            $this->_redirect('checkout/onepage/success/');
+        }
+        else
+        {
             $result=['error'=>1,'msg'=>'Your custom message'];
         }
-        
+
         $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
-        $response->setData(['financingIntent' => [
-            'extra' => $result
+        $response->setData(['Apurata' => [
+            'compra' => $result
             ]]);
         return $response;
     }

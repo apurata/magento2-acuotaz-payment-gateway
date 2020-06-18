@@ -9,8 +9,9 @@ use Magento\Framework\UrlInterface;
 class Config extends \Magento\Payment\Gateway\Config\Config
 {
     const KEY_ACTIVE = 'active';
+    const KEY_APURATA_CLIENT_ID = 'apurata_client_id';
     const FINANCING_INTENT_PATH = 'apurata_financing/financingintent/generate';
-    const APURATA_DOMAIN = 'https://apurata.com';
+    const APURATA_DOMAIN = 'http://localhost:8000';
     const POS_ENDPOINT = '/pos/crear-orden-y-continuar';
 
     /**
@@ -56,6 +57,16 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     public function getFinancingIntentUrl()
     {
         return $this->urlHelper->getUrl(self::FINANCING_INTENT_PATH);
+    }
+
+    /**
+     * Get Apurata client ID
+     * 
+     * @return string
+     */
+    public function getApurataClientId()
+    {
+        return (string) $this->getValue(self::KEY_APURATA_CLIENT_ID);
     }
 
     /**

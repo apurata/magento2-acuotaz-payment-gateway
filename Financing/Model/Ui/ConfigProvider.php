@@ -34,6 +34,7 @@ class ConfigProvider implements ConfigProviderInterface
             'payment' => [
                 self::CODE => [
                     'isActive' => $this->config->isActive(),
+                    'apurataClientId' => $this->config->getApurataClientId(),
                     'financingIntentUrl' => $this->config->getFinancingIntentUrl(),
                     'financingCreationUrl' => $this->config->getFinancingCreationUrl(),
                 ],

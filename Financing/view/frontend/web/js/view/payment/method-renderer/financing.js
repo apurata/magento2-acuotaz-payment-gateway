@@ -38,6 +38,7 @@ define(
 
                 this.financingIntentUrl = config.financingIntentUrl;
                 this.financingCreationUrl = config.financingCreationUrl;
+                this.apurataClientId = config.apurataClientId;
             },
 
             /**
@@ -66,12 +67,14 @@ define(
                     }
                     
                     var keys = Object.keys(response.financingIntent)
-                    this.financingIntentUrl += '?'
+                    self.financingCreationUrl += '?pos_client_id=' + self.apurataClientId;
                     for (var key of keys) {
-                        this.financingIntentUrl += key + '=' + response.financingIntent[key] + '&' 
+                        var param = '&' + key + '=' + response.financingIntent[key];
+                        console.log(param)
+                        self.financingCreationUrl += param; 
                     }
-
-                    window.location.replace(this.financingIntentUrl.slice(0, -1));
+                    /* console.log(self.financingCreationUrl) */
+                    window.location.replace(self.financingCreationUrl);
                 });
             },
         });

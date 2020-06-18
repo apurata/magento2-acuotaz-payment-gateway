@@ -15,8 +15,8 @@ use Magento\Checkout\Model\Cart;
 
 class Generate extends Action
 {
-    const FINANCING_FAIL_URL = 'checkout/#payment';
-    const FINANCING_SUCCESS_URL = 'apurata_financing/order/create/quote_id/';
+    const FINANCING_FAIL_URL = 'http://localhost/magento/checkout/#payment';
+    const FINANCING_SUCCESS_URL = 'http://localhost/magento/apurata_financing/order/create/quote_id/';
     const MAGENTO_ORDERS_URL = 'sales/order/history/';
 
 
@@ -83,11 +83,11 @@ class Generate extends Action
         $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
 
         $response->setData(['financingIntent' => [
-                'order_id' => urlencode($this->cart->getQuote()->getId() . $this->customerSession->getCustomer()->getEmail()),
+                'order_id' => urlencode($this->cart->getQuote()->getId()),
                 'amount' => urlencode($this->cart->getQuote()->getGrandTotal()),
                 'url_redir_on_canceled' => urlencode(self::FINANCING_FAIL_URL),
                 'url_redir_on_rejected' => urlencode(self::FINANCING_FAIL_URL),
-                'url_redir_on_success' => urlencode(self::FINANCING_SUCCESS_URL),
+                'url_redir_on_success' => urlencode(self::FINANCING_SUCCESS_URL . $this->cart->getQuote()->getId()),
                 'customer_data__email' => urlencode($this->customerSession->getCustomer()->getEmail()),
                 'customer_data__phone' => urlencode($this->getCustomerPhone($customer)),
                 'customer_data__billing_first_name' => urlencode($this->customerSession->getCustomer()->getFirstname()),
