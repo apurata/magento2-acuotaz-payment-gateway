@@ -10,9 +10,8 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 {
     const KEY_ACTIVE = 'active';
     const KEY_APURATA_CLIENT_ID = 'apurata_client_id';
-    const FINANCING_INTENT_PATH = 'apurata_financing/financingintent/generate';
-    const APURATA_DOMAIN = 'http://localhost:8000';
-    const POS_ENDPOINT = '/pos/crear-orden-y-continuar';
+    const FINANCING_INTENT_PATH = 'apuratafinancing/payment/intent';
+    const APURATA_POS_URL = 'http://localhost:8000/pos/crear-orden-y-continuar';
 
     /**
      * @var Encryptor
@@ -76,6 +75,6 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      */
     public function getFinancingCreationUrl()
     {
-        return self::APURATA_DOMAIN . self::POS_ENDPOINT; 
+        return self::APURATA_POS_URL; 
     }
 }

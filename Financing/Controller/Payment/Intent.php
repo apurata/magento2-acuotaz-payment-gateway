@@ -1,6 +1,6 @@
 <?php
 
-namespace Apurata\Financing\Controller\FinancingIntent;
+namespace Apurata\Financing\Controller\Payment;
 
 use Psr\Log\LoggerInterface;
 use Magento\Framework\App\Action\Action;
@@ -12,13 +12,13 @@ use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\ObjectManager;
 use Magento\Checkout\Model\Cart;
+use Magento\Framework\UrlInterface;
 
-class Generate extends Action
+class Intent extends Action
 {
-    const FINANCING_FAIL_URL = 'http://localhost/magento/checkout/#payment';
-    const FINANCING_SUCCESS_URL = 'http://localhost/magento/apurata_financing/order/create/quote_id/';
+    const FINANCING_FAIL_URL = 'checkout/#payment';
+    const FINANCING_SUCCESS_URL = 'apuratafinancing/payment/placeorder/quote_id/';
     const MAGENTO_ORDERS_URL = 'sales/order/history/';
-
 
     /**
      * @var LoggerInterface
@@ -41,6 +41,11 @@ class Generate extends Action
     private $checkoutSession;
 
     /**
+     * @var url
+     */
+    private $urlBuilder;
+
+    /**
      * @param Context $context
      * @param LoggerInterface $logger
      * @param CustomerSession $customerSession
@@ -51,6 +56,7 @@ class Generate extends Action
         LoggerInterface $logger,
         CustomerSession $customerSession,
         CheckoutSession $checkoutSession,
+        UrlInterface $urlBuilder,
         Cart $cart
     ) {
         parent::__construct($context);
@@ -58,7 +64,7 @@ class Generate extends Action
         $this->logger = $logger;
         $this->customerSession = $customerSession;
         $this->checkoutSession = $checkoutSession;
-        $this->objectManager = ObjectManager::getInstance();
+        $this->urlBuilder = $urlBuilder;
         $this->cart = $cart;
     }
 
@@ -67,7 +73,7 @@ class Generate extends Action
      */
     private function getCustomerPhone($customer)
     {
-        $addressRepositoryInterface = $this->objectManager->get('\Magento\Customer\Api\AddressRepositoryInterface');
+        $addressRepositoryInterface = $this->_objectManager->get('\Magento\Customer\Api\AddressRepositoryInterface');
         $billingAddressId = $customer->getDefaultBilling();
         $billingAddress = $addressRepositoryInterface->getById($billingAddressId);
         return $billingAddress->getTelephone();
@@ -79,15 +85,14 @@ class Generate extends Action
     public function execute()
     {
         $customer = $this->customerSession->getCustomer();
-
+        
         $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
-
         $response->setData(['financingIntent' => [
                 'order_id' => urlencode($this->cart->getQuote()->getId()),
                 'amount' => urlencode($this->cart->getQuote()->getGrandTotal()),
-                'url_redir_on_canceled' => urlencode(self::FINANCING_FAIL_URL),
-                'url_redir_on_rejected' => urlencode(self::FINANCING_FAIL_URL),
-                'url_redir_on_success' => urlencode(self::FINANCING_SUCCESS_URL . $this->cart->getQuote()->getId()),
+                'url_redir_on_canceled' => urlencode($this->urlBuilder->getUrl(self::FINANCING_FAIL_URL)),
+                'url_redir_on_rejected' => urlencode($this->urlBuilder->getUrl(self::FINANCING_FAIL_URL)),
+                'url_redir_on_success' => urlencode($this->urlBuilder->getUrl(self::FINANCING_SUCCESS_URL . $this->cart->getQuote()->getId())),
                 'customer_data__email' => urlencode($this->customerSession->getCustomer()->getEmail()),
                 'customer_data__phone' => urlencode($this->getCustomerPhone($customer)),
                 'customer_data__billing_first_name' => urlencode($this->customerSession->getCustomer()->getFirstname()),
