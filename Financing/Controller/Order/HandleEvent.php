@@ -8,6 +8,7 @@ use Magento\Framework\Controller\ResultFactory;
 use Magento\Sales\Model\Order;
 use Magento\Framework\Webapi\Exception;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Checkout\Model\Cart;
 
 class HandleEvent extends Action
 {
@@ -15,9 +16,11 @@ class HandleEvent extends Action
 
     public function __construct(
         Context $context,
+        Cart $cart,
         ScopeConfigInterface $scopeConfig,
         Order $order
     ) {
+        $this->cart = $cart;
         $this->scopeConfig = $scopeConfig; 
         $this->order = $order;
         return parent::__construct($context);
@@ -63,6 +66,7 @@ class HandleEvent extends Action
 
         if ($event == 'approved' && $order->getStatus() == 'pending') {
             $order->setState('holded')->setStatus('holded');
+            $this->cart->truncate()->save();
         } else if ($event == 'validated') {
             $order->setState('processing')->setStatus('processing');
         } else if ($event == 'rejected') {

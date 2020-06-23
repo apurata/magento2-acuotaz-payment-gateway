@@ -13,51 +13,24 @@ use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\ObjectManager;
 use Magento\Checkout\Model\Cart;
 use Magento\Framework\UrlInterface;
+use Magento\Quote\Api\CartManagementInterface;
+use Magento\Sales\Model\Order;
 
 class Intent extends Action
 {
     const FINANCING_FAIL_URL = 'checkout/#payment';
-    const FINANCING_SUCCESS_URL = 'apuratafinancing/order/placeorder?quote_id=';
+    const FINANCING_SUCCESS_URL = 'checkout/onepage/success/';
     const MAGENTO_ORDERS_URL = 'sales/order/history/';
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var CustomerSession
-     */
-    private $customerSession;
-
-    /**
-     * @var cart
-     */
-    private $cart;
-
-    /**
-     * @var CheckoutSession
-     */
-    private $checkoutSession;
-
-    /**
-     * @var url
-     */
-    private $urlBuilder;
-
-    /**
-     * @param Context $context
-     * @param LoggerInterface $logger
-     * @param CustomerSession $customerSession
-     * @param CheckoutSession $checkoutSession
-     */
     public function __construct(
         Context $context,
         LoggerInterface $logger,
         CustomerSession $customerSession,
         CheckoutSession $checkoutSession,
         UrlInterface $urlBuilder,
-        Cart $cart
+        Cart $cart,
+        CartManagementInterface $cartManagementInterface,
+        Order $order
     ) {
         parent::__construct($context);
 
@@ -66,11 +39,10 @@ class Intent extends Action
         $this->checkoutSession = $checkoutSession;
         $this->urlBuilder = $urlBuilder;
         $this->cart = $cart;
+        $this->cartManagementInterface = $cartManagementInterface;
+        $this->order = $order;
     }
 
-    /**
-     * return client phone
-     */
     private function getCustomerPhone($customer)
     {
         $addressRepositoryInterface = $this->_objectManager->get('\Magento\Customer\Api\AddressRepositoryInterface');
@@ -79,38 +51,32 @@ class Intent extends Action
         return $billingAddress->getTelephone();
     }
 
-    /**
-     * @inheritdoc
-     */
     public function execute()
     {
+        $quote = $this->cart->getQuote();
+        $quote->setPaymentMethod('apurata_financing');
+        $quote->collectTotals();
+        $quote->getPayment()->importData(['method' => 'apurata_financing']);
+        $quote->save();
+
+        $orderId = $this->cartManagementInterface->placeOrder($quote->getId());
+        $order = $this->order->load($orderId);
+        $order->setState('pending')->setStatus('pending');
+        $order->save();
+
         $customer = $this->customerSession->getCustomer();
-        
         $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
         $response->setData(['financingIntent' => [
-                'order_id' => urlencode($this->cart->getQuote()->getId()),
-                'amount' => urlencode($this->cart->getQuote()->getGrandTotal()),
+                'order_id' => urlencode($orderId),
+                'amount' => urlencode($quote->getGrandTotal()),
                 'url_redir_on_canceled' => urlencode(rtrim($this->urlBuilder->getUrl(self::FINANCING_FAIL_URL), '/')),
                 'url_redir_on_rejected' => urlencode(rtrim($this->urlBuilder->getUrl(self::FINANCING_FAIL_URL), '/')),
-                'url_redir_on_success' => urlencode($this->urlBuilder->getUrl(self::FINANCING_SUCCESS_URL . $this->cart->getQuote()->getId())),
+                'url_redir_on_success' => urlencode(rtrim($this->urlBuilder->getUrl(self::FINANCING_SUCCESS_URL . $orderId), '/')),
                 'customer_data__email' => urlencode($this->customerSession->getCustomer()->getEmail()),
                 'customer_data__phone' => urlencode($this->getCustomerPhone($customer)),
                 'customer_data__billing_first_name' => urlencode($this->customerSession->getCustomer()->getFirstname()),
                 'customer_data__billing_last_name' => urlencode($this->customerSession->getCustomer()->getlastname())
             ]]);
-        return $response;
-    }
-
-    /**
-     * Return response for bad request
-     * @param ResultInterface $response
-     * @return ResultInterface
-     */
-    private function processBadRequest(ResultInterface $response)
-    {
-        $response->setHttpResponseCode(Exception::HTTP_BAD_REQUEST);
-        $response->setData(['message' => __('Sorry, but something went wrong')]);
-
         return $response;
     }
 }
