@@ -1,17 +1,15 @@
 <?php
 
-namespace Apurata\Financing\Controller\Payment;
+namespace Apurata\Financing\Controller\Order;
 
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\ResultFactory;
-use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Webapi\Exception;
-use Magento\Quote\Model\QuoteFactory;
-use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Quote\Api\CartManagementInterface;
 use Magento\Checkout\Model\Cart;
 use Magento\Sales\Model\Order;
+use Magento\Framework\View\Result\PageFactory;
 
 class PlaceOrder extends Action
 {
@@ -19,11 +17,6 @@ class PlaceOrder extends Action
      * @var QuoteFactory
      */
     private $quoteFactory;
-
-    /**
-     * @var CheckoutSession
-     */
-    private $checkoutSession;
 
     /**
      * @var cart
@@ -43,12 +36,10 @@ class PlaceOrder extends Action
         Context $context,
         QuoteFactory $quoteFactory,
         CartManagementInterface $cartManagementInterface,
-        CheckoutSession $checkoutSession,
         Cart $cart,
         Order $order,
-        \Magento\Framework\View\Result\PageFactory $pageFactory
+        PageFactory $pageFactory
     ) {
-        $this->checkoutSession = $checkoutSession;
         $this->quoteFactory = $quoteFactory;
         $this->cartManagementInterface = $cartManagementInterface;
         $this->cart = $cart;
@@ -72,14 +63,12 @@ class PlaceOrder extends Action
         
         try
         {
-            $this->cartManagementInterface->placeOrder($quote->getId());
+            $orderId = $this->cartManagementInterface->placeOrder($quote->getId());
             $this->cart->truncate()->save();
             return $this->pageFactory->create();
         }
-        catch (\Exception $e) {
-            return $this->_redirect('');
+        catch (\Exception $e) {_redirect('');
             /*$this->messageManager->addExceptionMessage(
-                $e,
                 __('The order #%1 cannot be processed.', $quote->getReservedOrderId())
             );*/
         }

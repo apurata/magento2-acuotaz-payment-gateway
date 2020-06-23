@@ -1,6 +1,6 @@
 <?php
 
-namespace Apurata\Financing\Controller\Payment;
+namespace Apurata\Financing\Controller\Order;
 
 use Psr\Log\LoggerInterface;
 use Magento\Framework\App\Action\Action;
@@ -17,7 +17,7 @@ use Magento\Framework\UrlInterface;
 class Intent extends Action
 {
     const FINANCING_FAIL_URL = 'checkout/#payment';
-    const FINANCING_SUCCESS_URL = 'apuratafinancing/payment/placeorder/quote_id/';
+    const FINANCING_SUCCESS_URL = 'apuratafinancing/order/placeorder?quote_id=';
     const MAGENTO_ORDERS_URL = 'sales/order/history/';
 
     /**
@@ -90,8 +90,8 @@ class Intent extends Action
         $response->setData(['financingIntent' => [
                 'order_id' => urlencode($this->cart->getQuote()->getId()),
                 'amount' => urlencode($this->cart->getQuote()->getGrandTotal()),
-                'url_redir_on_canceled' => urlencode($this->urlBuilder->getUrl(self::FINANCING_FAIL_URL)),
-                'url_redir_on_rejected' => urlencode($this->urlBuilder->getUrl(self::FINANCING_FAIL_URL)),
+                'url_redir_on_canceled' => urlencode(rtrim($this->urlBuilder->getUrl(self::FINANCING_FAIL_URL), '/')),
+                'url_redir_on_rejected' => urlencode(rtrim($this->urlBuilder->getUrl(self::FINANCING_FAIL_URL), '/')),
                 'url_redir_on_success' => urlencode($this->urlBuilder->getUrl(self::FINANCING_SUCCESS_URL . $this->cart->getQuote()->getId())),
                 'customer_data__email' => urlencode($this->customerSession->getCustomer()->getEmail()),
                 'customer_data__phone' => urlencode($this->getCustomerPhone($customer)),

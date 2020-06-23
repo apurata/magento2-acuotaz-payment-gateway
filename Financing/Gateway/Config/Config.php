@@ -10,7 +10,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 {
     const KEY_ACTIVE = 'active';
     const KEY_APURATA_CLIENT_ID = 'apurata_client_id';
-    const FINANCING_INTENT_PATH = 'apuratafinancing/payment/intent';
+    const FINANCING_INTENT_PATH = 'apuratafinancing/order/intent';
     const APURATA_POS_URL = 'http://localhost:8000/pos/crear-orden-y-continuar';
 
     /**
