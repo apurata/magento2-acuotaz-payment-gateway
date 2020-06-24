@@ -55,7 +55,6 @@ class Intent extends Action
     {
         $quote = $this->cart->getQuote();
         $quote->setPaymentMethod('apurata_financing');
-        $quote->collectTotals();
         $quote->getPayment()->importData(['method' => 'apurata_financing']);
         $quote->save();
 
@@ -63,6 +62,8 @@ class Intent extends Action
         $order = $this->order->load($orderId);
         $order->setState('pending')->setStatus('pending');
         $order->save();
+
+        /* $this->checkoutSession->restoreQuote(); */
 
         $customer = $this->customerSession->getCustomer();
         $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);

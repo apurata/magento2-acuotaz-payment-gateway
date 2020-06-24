@@ -25,8 +25,7 @@ class PlaceOrder extends Action
     }
 
     public function execute()
-    {        
-        $this->cart->truncate()->save();
+    {
         return $this->_pageFactory->create();
     }
 }

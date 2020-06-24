@@ -9,6 +9,7 @@ use Magento\Sales\Model\Order;
 use Magento\Framework\Webapi\Exception;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Checkout\Model\Cart;
+use Magento\Checkout\Model\Session as CheckoutSession;
 
 class HandleEvent extends Action
 {
@@ -18,11 +19,13 @@ class HandleEvent extends Action
         Context $context,
         Cart $cart,
         ScopeConfigInterface $scopeConfig,
+        CheckoutSession $checkoutSession,
         Order $order
     ) {
         $this->cart = $cart;
         $this->scopeConfig = $scopeConfig; 
         $this->order = $order;
+        $this->checkoutSession = $checkoutSession;
         return parent::__construct($context);
     }
 
@@ -71,8 +74,10 @@ class HandleEvent extends Action
             $order->setState('processing')->setStatus('processing');
         } else if ($event == 'rejected') {
             $order->setState('canceled')->setStatus('canceled');
+            $this->checkoutSession->restoreQuote();
         } else if ($event == 'canceled') {
             $order->setState('canceled')->setStatus('canceled');
+            $this->checkoutSession->restoreQuote();
         } else {
             $response->setHttpResponseCode(Exception::HTTP_BAD_REQUEST);
             $response->setData(['message' => __('Event not found')]);
