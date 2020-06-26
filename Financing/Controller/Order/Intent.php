@@ -18,7 +18,7 @@ use Magento\Sales\Model\Order;
 
 class Intent extends Action
 {
-    const FINANCING_FAIL_URL = 'checkout/#payment';
+    const FINANCING_FAIL_URL = 'apuratafinancing/order/cancelation';
     const FINANCING_SUCCESS_URL = 'checkout/onepage/success/';
     const MAGENTO_ORDERS_URL = 'sales/order/history/';
 
@@ -60,8 +60,8 @@ class Intent extends Action
 
         $orderId = $this->cartManagementInterface->placeOrder($quote->getId());
         $order = $this->order->load($orderId);
-        $order->setState('pending')->setStatus('pending');
-        $order->save();
+        /* $order->setState('pending')->setStatus('pending');
+        $order->save(); */
 
         /* $this->checkoutSession->restoreQuote(); */
 

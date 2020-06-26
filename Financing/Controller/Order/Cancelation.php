@@ -8,8 +8,9 @@ use Magento\Framework\Webapi\Exception;
 use Magento\Sales\Model\Order;
 use Magento\Framework\View\Result\PageFactory;
 use Magento\Checkout\Model\Cart;
+use Magento\Checkout\Model\Session as CheckoutSession;
 
-class PlaceOrder extends Action
+class Cancelation extends Action
 {
     protected $_pageFactory;
     private $cart;
@@ -17,15 +18,16 @@ class PlaceOrder extends Action
     public function __construct(
         Context $context,
         PageFactory $pageFactory,
-        Cart $cart
+        CheckoutSession $checkoutSession
     ) {
-        $this->cart = $cart;
         $this->_pageFactory = $pageFactory;
+        $this->checkoutSession = $checkoutSession;
         return parent::__construct($context);
     }
 
     public function execute()
     {
-        return $this->_pageFactory->create();
+        $this->checkoutSession->restoreQuote();
+        $this->_redirect('checkout', ['_fragment' => 'payment']);
     }
 }

@@ -9,7 +9,7 @@ use Magento\Sales\Model\Order;
 use Magento\Framework\Webapi\Exception;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Checkout\Model\Cart;
-use Magento\Checkout\Model\Session as CheckoutSession;
+use Magento\Sales\Api\OrderManagementInterface ;
 
 class HandleEvent extends Action
 {
@@ -19,13 +19,13 @@ class HandleEvent extends Action
         Context $context,
         Cart $cart,
         ScopeConfigInterface $scopeConfig,
-        CheckoutSession $checkoutSession,
-        Order $order
+        Order $order,
+        OrderManagementInterface $orderManagement
     ) {
         $this->cart = $cart;
         $this->scopeConfig = $scopeConfig; 
         $this->order = $order;
-        $this->checkoutSession = $checkoutSession;
+        $this->orderManagement = $orderManagement;
         return parent::__construct($context);
     }
 
@@ -43,7 +43,7 @@ class HandleEvent extends Action
         }
 
         // Check Authorization
-        $auth = $this->getRequest()->getHeader('Authorization');
+        /* $auth = $this->getRequest()->getHeader('Authorization');
         if (!$auth) {
             $response->setHttpResponseCode(Exception::HTTP_BAD_REQUEST);
             $response->setData(['message' => __('Not authorized')]);
@@ -65,26 +65,35 @@ class HandleEvent extends Action
             $response->setHttpResponseCode(Exception::HTTP_BAD_REQUEST);
             $response->setData(['message' => __('Invalid authorization token')]);
             return $response;
-        }
+        } */
 
         if ($event == 'approved' && $order->getStatus() == 'pending') {
             $order->setState('holded')->setStatus('holded');
-            $this->cart->truncate()->save();
         } else if ($event == 'validated') {
             $order->setState('processing')->setStatus('processing');
         } else if ($event == 'rejected') {
-            $order->setState('canceled')->setStatus('canceled');
-            $this->checkoutSession->restoreQuote();
+            $this->orderManagement->cancel($order->getId());
         } else if ($event == 'canceled') {
-            $order->setState('canceled')->setStatus('canceled');
-            $this->checkoutSession->restoreQuote();
+            /* $this->orderManagement->cancel($orderId); */
         } else {
             $response->setHttpResponseCode(Exception::HTTP_BAD_REQUEST);
             $response->setData(['message' => __('Event not found')]);
             return $response;
         }
-        $order->save();
-        $response->setData(['message' => __('Request processed')]);
+        /* $order->registerCancellation('')->save(); */
+        /* $order->setState('canceled')->setStatus('canceled');
+        $order->save(); */
+        $allInvoiced = true;
+        $temp = 45;
+        foreach ($order->getAllItems() as $item) {
+            $temp =  4.000 - 4.000 - 0.000;
+            if ($item->getQtyToInvoice()) {
+                $allInvoiced = false;
+                break;
+            }
+        }
+
+        $response->setData(['message' => $temp]);
         return $response;
     }
 }
