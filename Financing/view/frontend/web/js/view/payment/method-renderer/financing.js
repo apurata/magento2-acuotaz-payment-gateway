@@ -2,12 +2,14 @@ define(
     [
         'jquery',
         'Magento_Checkout/js/view/payment/default',
+        'Magento_Checkout/js/action/redirect-on-success',
         'Magento_Ui/js/model/messageList',
         'mage/translate'
     ],
     function (
         $,
         Component,
+        redirectOnSuccessAction,
         messageList,
         $t
     ) {
@@ -50,32 +52,10 @@ define(
                 return this.getCode() === this.isChecked();
             },
 
-            /**
-             * Place the order
-             * 
-             * @param {Object} data
-             */
-            placeOrderClick: function () {
-                var self = this;
-                $.get(this.financingIntentUrl, {}, function(response) {
 
-                    if (!response || !response.financingIntent) {
-                        messageList.addErrorMessage({
-                            message: $t('An error occurred generating the financing intent.')
-                        });
-                        return;
-                    }
-                    
-                    var keys = Object.keys(response.financingIntent)
-                    self.financingCreationUrl += '?pos_client_id=' + self.apurataClientId;
-                    for (var key of keys) {
-                        var param = '&' + key + '=' + response.financingIntent[key];
-                        console.log(param)
-                        self.financingCreationUrl += param; 
-                    }
-                    /* console.log(self.financingCreationUrl) */
-                    window.location.replace(self.financingCreationUrl);
-                });
+            afterPlaceOrder: function () {
+                redirectOnSuccessAction.redirectUrl = this.financingIntentUrl + '?pos_client_id=' + this.apurataClientId;
+                this.redirectAfterPlaceOrder = true;
             },
         });
     }

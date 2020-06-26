@@ -4,7 +4,6 @@
             <apurata_financing>
                 <model>Apurata\Financing\Model\Financing</model>
                 <title>Apurata</title>
-                <payment_action>authorize_capture</payment_action>
                 <active>0</active>
                 <order_status>pending</order_status>
             </apurata_financing>

@@ -43,7 +43,7 @@ class HandleEvent extends Action
         }
 
         // Check Authorization
-        /* $auth = $this->getRequest()->getHeader('Authorization');
+        $auth = $this->getRequest()->getHeader('Authorization');
         if (!$auth) {
             $response->setHttpResponseCode(Exception::HTTP_BAD_REQUEST);
             $response->setData(['message' => __('Not authorized')]);
@@ -65,35 +65,24 @@ class HandleEvent extends Action
             $response->setHttpResponseCode(Exception::HTTP_BAD_REQUEST);
             $response->setData(['message' => __('Invalid authorization token')]);
             return $response;
-        } */
+        }
 
         if ($event == 'approved' && $order->getStatus() == 'pending') {
-            $order->setState('holded')->setStatus('holded');
+            $order->hold();
         } else if ($event == 'validated') {
             $order->setState('processing')->setStatus('processing');
         } else if ($event == 'rejected') {
-            $this->orderManagement->cancel($order->getId());
+            $order->registerCancellation('Cliente no aprobado en Apurata');
         } else if ($event == 'canceled') {
-            /* $this->orderManagement->cancel($orderId); */
+            $order->registerCancellation('Aplicacion cancelada en Apurata');
         } else {
             $response->setHttpResponseCode(Exception::HTTP_BAD_REQUEST);
             $response->setData(['message' => __('Event not found')]);
             return $response;
         }
-        /* $order->registerCancellation('')->save(); */
-        /* $order->setState('canceled')->setStatus('canceled');
-        $order->save(); */
-        $allInvoiced = true;
-        $temp = 45;
-        foreach ($order->getAllItems() as $item) {
-            $temp =  4.000 - 4.000 - 0.000;
-            if ($item->getQtyToInvoice()) {
-                $allInvoiced = false;
-                break;
-            }
-        }
-
-        $response->setData(['message' => $temp]);
+       
+        $order->save();
+        $response->setData(['message' => __('Request processed')]);
         return $response;
     }
 }
