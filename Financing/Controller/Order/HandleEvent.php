@@ -10,11 +10,12 @@ use Magento\Framework\Webapi\Exception;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Checkout\Model\Cart;
 use Magento\Sales\Api\OrderManagementInterface ;
+use Magento\Store\Model\ScopeInterface;
+use Apurata\Financing\Helper\ConfigData;
+
 
 class HandleEvent extends Action
 {
-    const SECRET_TOKEN_CONFIG_PATH = 'payment/apurata_financing/secret_token';
-
     public function __construct(
         Context $context,
         Cart $cart,
@@ -56,10 +57,7 @@ class HandleEvent extends Action
             return $response;
         }
 
-        $secret_token = $this->scopeConfig->getValue(
-            self::SECRET_TOKEN_CONFIG_PATH,
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-        );
+        $secret_token = $this->scopeConfig->getValue(ConfigData::SECRET_TOKEN_CONFIG_PATH, ScopeInterface::SCOPE_STORE);
 
         if ($token != $secret_token) {
             $response->setHttpResponseCode(Exception::HTTP_BAD_REQUEST);

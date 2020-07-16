@@ -10,13 +10,11 @@ use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\Controller\ResultFactory;
+use Apurata\Financing\Helper\ConfigData;
+
 
 class Intent extends Action
 {
-    const FINANCING_FAIL_URL = 'apuratafinancing/order/cancelation';
-    const FINANCING_SUCCESS_URL = 'checkout/onepage/success/';
-    const MAGENTO_ORDERS_URL = 'sales/order/history/';
-
     public function __construct(
         Context $context,
         LoggerInterface $logger,
@@ -47,14 +45,14 @@ class Intent extends Action
         $intentParams = '?pos_client_id='.$this->getRequest()->getParam('pos_client_id').
             '&order_id='.urlencode($order->getId()).
             '&amount='.urlencode($order->getGrandTotal()).
-            '&url_redir_on_canceled='.urlencode(rtrim($this->urlBuilder->getUrl(self::FINANCING_FAIL_URL), '/')).
-            '&url_redir_on_rejected='.urlencode(rtrim($this->urlBuilder->getUrl(self::FINANCING_FAIL_URL), '/')).
-            '&url_redir_on_success='.urlencode(rtrim($this->urlBuilder->getUrl(self::FINANCING_SUCCESS_URL . $order->getId()), '/')).
+            '&url_redir_on_canceled='.urlencode(rtrim($this->urlBuilder->getUrl(ConfigData::FINANCING_FAIL_URL), '/')).
+            '&url_redir_on_rejected='.urlencode(rtrim($this->urlBuilder->getUrl(ConfigData::FINANCING_FAIL_URL), '/')).
+            '&url_redir_on_success='.urlencode(rtrim($this->urlBuilder->getUrl(ConfigData::FINANCING_SUCCESS_URL . $order->getId()), '/')).
             '&customer_data__email='.urlencode($this->customerSession->getCustomer()->getEmail()).
             '&customer_data__phone='.urlencode($this->getCustomerPhone($customer)).
             '&customer_data__billing_first_name='.urlencode($this->customerSession->getCustomer()->getFirstname()).
             '&customer_data__billing_last_name='.urlencode($this->customerSession->getCustomer()->getlastname());
 
-        $this->_redirect('http://localhost:8000/pos/crear-orden-y-continuar'.$intentParams);
+        $this->_redirect(ConfigData::APURATA_DOMAIN.ConfigData::APURATA_CREATE_ORDER_URL.$intentParams);
     }
 }
