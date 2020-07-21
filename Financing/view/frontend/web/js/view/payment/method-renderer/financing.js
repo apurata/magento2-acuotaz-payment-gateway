@@ -41,6 +41,16 @@ define(
                 this.financingIntentUrl = config.financingIntentUrl;
                 this.financingCreationUrl = config.financingCreationUrl;
                 this.apurataClientId = config.apurataClientId;
+
+                console.log('HI');
+                var r = new XMLHttpRequest();
+                r.open("GET", "https://apurata.com/pos/info-steps", true);
+                r.onreadystatechange = function () {
+                if (r.readyState != 4 || r.status != 200) return;
+                var elem = document.getElementById("apurata-pos-steps");
+                elem.innerHTML = r.responseText;
+                };
+                r.send();
             },
 
             /**
