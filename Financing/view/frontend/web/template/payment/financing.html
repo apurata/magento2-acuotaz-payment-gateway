@@ -9,7 +9,81 @@
     </div>
     <div class="payment-method-content">
         <!--The next div will display any important information before redirect people to Apurata POS landing-->
-        <div data-bind="" afterRender="initApurataFinancing">
+        <div data-bind="" afterRender="initApurataFinancing" style="display: flex; margin-bottom: 1em;">
+            <div>
+                <style>
+                    .apurata-checkout{
+                        color: #777777;
+                        font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+                    }
+                    * {
+                      box-sizing: border-box;
+                    }
+                    .apurata-checkout .column {
+                      float: left;
+                      width: 25%;
+                      padding: 10px;
+                      height: 150px;
+                      text-align: center;
+                    }
+                    .apurata-checkout .row:after {
+                      content: "";
+                      display: table;
+                      clear: both;
+                    }
+                    .apurata-checkout .title{
+                        font-size: 14px;
+                        font-weight: bold;
+                    }
+                    .apurata-checkout p{
+                        font-size: 12px;
+                    }
+                    .apurata-checkout p.requirements{
+                        font-size: 12px;
+                        margin: 5px;
+                    }
+                    .apurata-checkout img.logo_principal{
+                        float: right;
+                        width: 25%;
+                    }
+                    .apurata-checkout .footer{
+                        margin-top: 14px;
+                    }
+                    @media only screen and (max-width: 600px) {
+                        .apurata-checkout .column {
+                            width: 50%;
+                        }
+                        .apurata-checkout img.logo_principal{
+                            width: 20%;
+                        }
+                    }
+                </style>
+                <div class="apurata-checkout">
+                    <p class="title">Paga en Cuotas SIN TARJETA DE CREDITO</p>
+                    <div class="row">
+                        <div class="column">
+                            <img src="https://static.apurata.com/img/pos/porcent.svg">
+                            <p>Desde 0% de Interés</p>
+                        </div>
+                        <div class="column">
+                            <img src="https://static.apurata.com/img/pos/fees.svg">
+                            <p>Escoge hasta 8 cuotas quincenales</p>
+                        </div>
+                        <div class="column">
+                            <img src="https://static.apurata.com/img/pos/form.svg">
+                            <p>Decisión  immediata completando breve formulario</p>
+                        </div>
+                        <div class="column">
+                            <img src="https://static.apurata.com/img/pos/check_apurata.svg">
+                            <p>Compra finalizada</p>
+                        </div>
+                    </div>
+                    <div class="footer">
+                        <img src="https://static.apurata.com/img/logo-dark.svg" alt="Apurata" class="logo_principal">
+                        <p class="requirements">* Requisitos: Estar al día en tus deudas, Teléfono Celular, DNI</p>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="actions-toolbar">
             <div class="primary">

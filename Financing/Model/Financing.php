@@ -80,7 +80,7 @@ class Financing extends \Magento\Payment\Model\Method\AbstractMethod
             return False;
         }
         $landing_config = $this->get_landing_config();
-        if ($quote->getGrandTotal() < $landing_config->min_amount || $quote->getGrandTotal() > $landing_config->max_amount) {
+        if (!$landing_config || $quote->getGrandTotal() < $landing_config->min_amount || $quote->getGrandTotal() > $landing_config->max_amount) {
             return False; 
         }
         return True;
