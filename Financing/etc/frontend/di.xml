@@ -7,4 +7,8 @@
             </argument>
         </arguments>
     </type>
+
+    <type name="Magento\Checkout\CustomerData\Cart">
+        <plugin name="extra_data" type="Apurata\Financing\Plugin\Checkout\CustomerData\Cart"/>
+    </type>
 </config>

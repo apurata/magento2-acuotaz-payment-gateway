@@ -42,7 +42,6 @@ define(
                 this.financingCreationUrl = config.financingCreationUrl;
                 this.apurataClientId = config.apurataClientId;
 
-                console.log('HI');
                 var r = new XMLHttpRequest();
                 r.open("GET", "https://apurata.com/pos/info-steps", true);
                 r.onreadystatechange = function () {

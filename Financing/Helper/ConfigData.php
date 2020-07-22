@@ -11,6 +11,8 @@ class ConfigData
     
     const APURATA_DOMAIN = 'http://localhost:8000';
     const APURATA_LANDING_CONFIG = '/pos/client/landing_config';
+    const APURATA_SIMULATOR = '/api/v1/simulator/all-possibilities';
+    const APURATA_LANDING_VERSION = 'pos_generic';
     const APURATA_CREATE_ORDER_URL = '/pos/crear-orden-y-continuar';
     
     const FINANCING_INTENT_PATH = 'apuratafinancing/order/intent';
