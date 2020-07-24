@@ -5,27 +5,22 @@ use Apurata\Financing\Helper\ConfigData;
  
 class Cart {
 
-    public function get_all_pos($amount) {
-        $params = json_encode(array('landing_version'=>ConfigData::APURATA_LANDING_VERSION, 'extra_amounts'=>array(floatval($amount))));
+    public function getAddOn($amount) {
         $ch = curl_init();
-
-        $url = ConfigData::APURATA_DOMAIN.ConfigData::APURATA_SIMULATOR;
+        $url = ConfigData::APURATA_DOMAIN.ConfigData::APURATA_ADD_ON.urlencode($amount);
         curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
         
-        $all_pos = curl_exec($ch);
-        $all_pos = json_decode($all_pos);
+        $addOn = curl_exec($ch);
         curl_close($ch);
-        return $all_pos;
+        return $addOn;
     }
 
     public function afterGetSectionData(\Magento\Checkout\CustomerData\Cart $subject, array $result)
     {
-        $extra_data = '';
-        if (floatval($result['subtotalAmount']) >= 100 && floatval($result['subtotalAmount']) <= 600){
+        $addOn = $this->getAddOn($result['subtotalAmount']);
+        /*if (floatval($result['subtotalAmount']) >= 100 && floatval($result['subtotalAmount']) <= 600){
             $all_pos = null;
             $all_pos = $this->get_all_pos($result['subtotalAmount']);
             $min_step = floatval($result['subtotalAmount']);
@@ -37,8 +32,8 @@ class Cart {
                 }
             }
             $extra_data = 'Pagalo en cuotas desde S/'.$min_step;
-        }
-        $result['extra_data'] = $extra_data;
+        }*/
+        $result['extra_data'] = $addOn;
         return $result;
     }
 }
