@@ -44,7 +44,7 @@ class HandleEvent extends Action
         }
 
         // Check Authorization
-        $auth = $this->getRequest()->getHeader('Authorization');
+        $auth = $this->getRequest()->getHeader('Apurata-Auth');
         if (!$auth) {
             $response->setHttpResponseCode(Exception::HTTP_BAD_REQUEST);
             $response->setData(['message' => __('Not authorized')]);
