@@ -1,0 +1,12 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <payment>
+            <apurata_financing>
+                <model>Apurata\Financing\Model\Financing</model>
+                <title>Apurata</title>
+                <active>0</active>
+                <order_status>pending</order_status>
+            </apurata_financing>
+        </payment>
+    </default>
+</config>
