@@ -1,0 +1,34 @@
+{
+    "name": "apurata/magento2-plugin",
+    "description": "Apurata Magento 2 plugin",
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://repo.magento.com/"
+        }
+    ],
+    "require": {
+        "php": "~7.1.0|~7.2.0|~7.3.0",
+        "psr/log": "1.1.0",
+        "magento/framework": "102.0.*",
+        "magento/module-config": "101.1.*",
+        "magento/module-directory": "100.3.*",
+        "magento/module-payment": "100.3.*",
+        "magento/module-checkout": "100.3.*",
+        "magento/module-sales": "102.0.*",
+        "magento/module-quote": "101.1.*",
+        "magento/module-ui": "101.1.*"
+    },
+    "type": "magento2-module",
+    "license": [
+        "OSL-3.0"
+    ],
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Apurata\\Financing\\": ""
+        }
+    }
+}

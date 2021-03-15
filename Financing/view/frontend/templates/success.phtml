@@ -1,0 +1,52 @@
+<?php
+/**
+ * @var \Apurata\Financing\Block\ThankYou $block
+ */
+$order = $block->getOrder();
+?>
+<div class="page-title-wrapper">
+    <h1 class="page-title">
+        <span class="base" data-ui-id="page-title-wrapper">Thank you for your purchase!</span>    </h1>
+    
+    <a href="<?php echo $block->actionUrl("sales/order/print/order_id/".$order->getId()."/");?>"
+        class="action print"
+        target="_blank"
+        rel="noopener">
+        Print receipt
+    </a>
+    </div>
+<div class="checkout-success">
+<?php if($order->getIncrementId()):?>
+    <?php if ($block->getCustomerId()) :?>
+        <p>
+            Your order number is: 
+            <a href="<?php echo $block->actionUrl("sales/order/view/order_id/".$order->getId()."/");?>"
+            class="order-number">
+                <?php echo __($order->getIncrementId()) ?>
+            </a>
+        </p>
+        <?php  else :?>
+            <p><?php echo __('Your order # is: <span>%1</span>.',$order->getIncrementId()) ?></p>
+        <?php endif;?>
+        <p>We'll email you an order confirmation with details and tracking info.</p>
+        <div class="actions-toolbar">
+            <div class="primary">
+                <a class="action primary continue" href="<?php echo $block->actionUrl('/');?>"><span>Continue Shopping</span></a>
+            </div>
+        </div>
+<?php endif;?>
+</div>
+<script>
+    require([
+        'Magento_Customer/js/customer-data',
+        'jquery'
+    ], function (customerData, $) {
+        'use strict';
+        $(function () {
+            var sections = ['cart'];
+            customerData.invalidate(sections);
+            customerData.reload(sections, true);
+            $('body').trigger('contentUpdated');
+        })
+    })
+</script>
