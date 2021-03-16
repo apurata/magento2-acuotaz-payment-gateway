@@ -51,7 +51,7 @@ class HandleEvent extends Action
             return $response;
         }
         list($auth_type, $token) = explode(' ', $auth);
-        if (strtolower($auth_type) != 'bearer'){
+        if (strtolower($auth_type) != 'Bearer'){
             $response->setHttpResponseCode(Exception::HTTP_BAD_REQUEST);
             $response->setData(['message' => __('Invalid authorization type')]);
             return $response;
@@ -65,9 +65,9 @@ class HandleEvent extends Action
             return $response;
         }
 
-        if ($event == 'approved' && $order->getStatus() == 'pending') {
+        if ($event == 'onhold' && $order->getStatus() == 'pending') {
             $order->hold();
-        } else if ($event == 'validated') {
+        } else if ($event == 'funded') {
             $order->setState('processing')->setStatus('processing');
         } else if ($event == 'rejected') {
             $order->registerCancellation('Cliente no aprobado en Apurata');
@@ -78,7 +78,6 @@ class HandleEvent extends Action
             $response->setData(['message' => __('Event not found')]);
             return $response;
         }
-       
         $order->save();
         $response->setData(['message' => __('Request processed')]);
         return $response;
