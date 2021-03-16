@@ -27,15 +27,16 @@ class RequestAddOn extends Action
     {
         $cart = $this->session->getQuote();
         $page = $this->getRequest()->getParam('page');
-        $url = ConfigData::APURATA_ADD_ON . urlencode($cart->getGrandTotal()) . '?page=cart';
+        $url = ConfigData::APURATA_ADD_ON . urlencode($cart->getGrandTotal()) . '?page=' . $page;
 
         list($respCode, $payWithApurataAddon) = $this->requestBuilder->makeCurlToApurata("GET", $url);
 			
 		if ($respCode == 200) {
-            $resultJson = $this->resultJsonFactory->create();
-            return $resultJson->setData(['addon' => str_replace(array("\r", "\n"), '', $payWithApurataAddon)]);
+            $addon = str_replace(array("\r", "\n"), '', $payWithApurataAddon);
 		} else {
-			return '';
+            $addon = '';
 		}
+        $resultJson = $this->resultJsonFactory->create();
+        return $resultJson->setData(['addon' => $addon]);
     }
 }

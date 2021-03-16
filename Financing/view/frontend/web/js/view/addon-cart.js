@@ -11,7 +11,7 @@ define(
             },
 
             getAddOn: function () {
-                $.get( window.BASE_URL + "apuratafinancing/order/requestaddon", function( data ) {
+                $.get( window.BASE_URL + "apuratafinancing/order/requestaddon?page=cart", function( data ) {
                     var elems = document.getElementsByClassName("acuotaz-add-on");
                     for (let index = 0; index < elems.length; ++index){
                         elems[index].innerHTML = data.addon;
