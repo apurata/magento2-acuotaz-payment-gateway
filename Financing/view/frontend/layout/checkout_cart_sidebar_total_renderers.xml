@@ -11,7 +11,7 @@
                                 <item name="subtotal.container" xsi:type="array">
                                     <item name="children" xsi:type="array">
                                         <item name="apurata_financing" xsi:type="array">
-                                            <item name="component" xsi:type="string">Apurata_Financing/js/view/summary/financing</item>
+                                            <item name="component" xsi:type="string">Apurata_Financing/js/view/addon</item>
                                         </item>
                                     </item>
                                 </item>
