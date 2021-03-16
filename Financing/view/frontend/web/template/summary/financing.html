@@ -1,0 +1,16 @@
+<div>Aqui deberia ir el addonnnnn</div>
+<div data-bind="" id="acuotaz-add-on" afterRender="getAddOn"></div>
+<script>
+    require([
+        'Magento_Customer/js/customer-data',
+        'jquery'
+    ], function (customerData, $) {
+        'use strict';
+        $(function () {
+            console.log('hola')
+    $.get( "/apuratafinancing/order/requestaddon", function( data ) {
+        console.log(data);
+    });
+        })
+    })
+</script>
