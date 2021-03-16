@@ -33,6 +33,21 @@
                                         </item>
                                     </item>
                                 </item>
+                                <item name="sidebar" xsi:type="array">
+                                    <item name="children" xsi:type="array">
+                                        <item name="summary" xsi:type="array">
+                                            <item name="children" xsi:type="array">
+                                                <item name="itemsBefore" xsi:type="array">
+                                                    <item name="children" xsi:type="array">
+                                                        <item name="apurata_financing" xsi:type="array">
+                                                            <item name="component" xsi:type="string">Apurata_Financing/js/view/addon-cart</item>
+                                                        </item>
+                                                    </item>
+                                                </item>
+                                            </item>
+                                        </item>
+                                    </item>
+                                </item>
                             </item>
                         </item>
                     </item>
