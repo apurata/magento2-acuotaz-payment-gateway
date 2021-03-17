@@ -1,0 +1,14 @@
+<div data-bind="" class="acuotaz-add-on" afterRender="getAddOn"></div>
+<script>
+    define(
+    [
+        'jquery'
+    ],
+    function getAddOn() {
+        $.get( window.BASE_URL + "apuratafinancing/order/requestaddon?page=product", function( data ) {
+            var elems = document.getElementsByClassName("acuotaz-add-on");
+            elems.innerHTML = data.addon;
+        });
+    }
+);
+</script>
