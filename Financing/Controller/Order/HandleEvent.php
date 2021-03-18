@@ -44,14 +44,14 @@ class HandleEvent extends Action
         }
 
         // Check Authorization
-        $auth = $this->getRequest()->getHeader('Apurata-Auth');
+        $auth = $this->getRequest()->getHeader('Authorization');
         if (!$auth) {
             $response->setHttpResponseCode(Exception::HTTP_BAD_REQUEST);
             $response->setData(['message' => __('Not authorized')]);
             return $response;
         }
         list($auth_type, $token) = explode(' ', $auth);
-        if (strtolower($auth_type) != 'Bearer'){
+        if (strtolower($auth_type) != 'bearer'){
             $response->setHttpResponseCode(Exception::HTTP_BAD_REQUEST);
             $response->setData(['message' => __('Invalid authorization type')]);
             return $response;
@@ -65,14 +65,12 @@ class HandleEvent extends Action
             return $response;
         }
 
-        if ($event == 'onhold' && $order->getStatus() == 'pending') {
-            $order->hold();
-        } else if ($event == 'funded') {
+        if ($event == 'funded') {
             $order->setState('processing')->setStatus('processing');
         } else if ($event == 'rejected') {
-            $order->registerCancellation('Cliente no aprobado en Apurata');
+            $order->cancel();
         } else if ($event == 'canceled') {
-            $order->registerCancellation('Aplicacion cancelada en Apurata');
+            $order->cancel();
         } else {
             $response->setHttpResponseCode(Exception::HTTP_BAD_REQUEST);
             $response->setData(['message' => __('Event not found')]);
