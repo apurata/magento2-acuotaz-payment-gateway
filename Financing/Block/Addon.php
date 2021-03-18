@@ -61,7 +61,6 @@ class Addon extends \Magento\Framework\View\Element\Template
             if($current_user->getLastname())
                 $url .= '&user__last_name=' . urlencode($current_user->getLastname());
         }
-        error_log($url);
         list($respCode, $payWithApurataAddon) = $this->requestBuilder->makeCurlToApurata("GET", $url);
 		if ($respCode == 200) {
             $addon = str_replace(array("\r", "\n"), '', $payWithApurataAddon);
