@@ -24,14 +24,14 @@ class HandleEvent extends Action
         OrderManagementInterface $orderManagement
     ) {
         $this->cart = $cart;
-        $this->scopeConfig = $scopeConfig; 
+        $this->scopeConfig = $scopeConfig;
         $this->order = $order;
         $this->orderManagement = $orderManagement;
         return parent::__construct($context);
     }
 
     public function execute()
-    {  
+    {
         $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
         $event = $this->getRequest()->getParam('event');
         $orderId = $this->getRequest()->getParam('order_id');
@@ -51,7 +51,7 @@ class HandleEvent extends Action
             return $response;
         }
         list($auth_type, $token) = explode(' ', $auth);
-        if (strtolower($auth_type) != 'Bearer'){
+        if (strtolower($auth_type) != 'bearer'){
             $response->setHttpResponseCode(Exception::HTTP_BAD_REQUEST);
             $response->setData(['message' => __('Invalid authorization type')]);
             return $response;
@@ -64,19 +64,26 @@ class HandleEvent extends Action
             $response->setData(['message' => __('Invalid authorization token')]);
             return $response;
         }
-
-        if ($event == 'onhold' && $order->getStatus() == 'pending') {
-            $order->hold();
-        } else if ($event == 'funded') {
-            $order->setState('processing')->setStatus('processing');
-        } else if ($event == 'rejected') {
-            $order->registerCancellation('Cliente no aprobado en Apurata');
-        } else if ($event == 'canceled') {
-            $order->registerCancellation('Aplicacion cancelada en Apurata');
-        } else {
-            $response->setHttpResponseCode(Exception::HTTP_BAD_REQUEST);
-            $response->setData(['message' => __('Event not found')]);
-            return $response;
+        switch ($event) {
+            case 'onhold':
+            case 'validated':
+            case 'created':
+            case 'approved':
+                error_log('Evento ignorado por Apurata:' . $event);
+                break;
+            case 'rejected':
+                $order->cancel();
+                break;
+            case 'canceled':
+                $order->cancel();
+                break;
+            case 'funded':
+                $order->setState('processing')->setStatus('processing');
+                break;
+            default:
+                $response->setHttpResponseCode(Exception::HTTP_BAD_REQUEST);
+                $response->setData(['message' => __('Event not found')]);
+                return $response;
         }
         $order->save();
         $response->setData(['message' => __('Request processed')]);

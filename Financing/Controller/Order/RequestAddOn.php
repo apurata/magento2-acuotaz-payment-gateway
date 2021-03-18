@@ -8,6 +8,8 @@ use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableProduct;
+use Magento\Framework\App\ObjectManager as ObjectManager;
 
 class RequestAddOn extends Action
 {
@@ -20,6 +22,7 @@ class RequestAddOn extends Action
         $this->session = $session;
         $this->requestBuilder = $requestBuilder;
         $this->resultJsonFactory = $resultJsonFactory;
+
         return parent::__construct($context);
     }
 
@@ -27,10 +30,10 @@ class RequestAddOn extends Action
     {
         $cart = $this->session->getQuote();
         $page = $this->getRequest()->getParam('page');
-        $url = ConfigData::APURATA_ADD_ON . urlencode($cart->getGrandTotal()) . '?page=' . $page;
+        $total = $cart->getGrandTotal();
 
+        $url = ConfigData::APURATA_ADD_ON . urlencode($total) .'?page=' . $page;
         list($respCode, $payWithApurataAddon) = $this->requestBuilder->makeCurlToApurata("GET", $url);
-			
 		if ($respCode == 200) {
             $addon = str_replace(array("\r", "\n"), '', $payWithApurataAddon);
 		} else {

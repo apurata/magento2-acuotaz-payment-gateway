@@ -27,7 +27,7 @@ define(
                 self._super();
                 return self;
             },
-            
+
             /**
              * Initialize Apurata Financing element
              */
