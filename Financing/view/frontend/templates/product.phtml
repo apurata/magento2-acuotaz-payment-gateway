@@ -1,13 +1,4 @@
-<div id="acuotaz-add-on-product"></div>
-<script>
-	require (
-        [
-            'jquery'
-		],
-        function ($) {
-            'use strict';
-            $.get( window.BASE_URL + "apuratafinancing/order/requestaddon?page=product", function(data) {
-                $('#acuotaz-add-on-product').html(data.addon);
-            });
-        });
-</script>
+
+<?php
+    echo $block->getApurataAddon('product');
+?>

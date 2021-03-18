@@ -2,7 +2,7 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
    <body>
         <referenceContainer name="product.info.main">
-            <block class="Magento\Catalog\Block\Product\View\Description" name="product.info.description" after="product.info.price" template="Apurata_Financing::product.phtml" />
+            <block class="Apurata\Financing\Block\Addon" name="product.info.description" after="product.info.price" template="Apurata_Financing::product.phtml" />
         </referenceContainer>
     </body>
 </page>
