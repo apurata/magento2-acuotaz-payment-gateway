@@ -3,6 +3,7 @@
 namespace Apurata\Financing\Model;
 
 use Apurata\Financing\Helper\ConfigData;
+use Apurata\Financing\Helper\ConfigReader;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Registry;
 use Magento\Framework\Api\ExtensionAttributesFactory;
@@ -34,6 +35,7 @@ class Financing extends \Magento\Payment\Model\Method\AbstractMethod
         Data $paymentData,
         ScopeConfigInterface $scopeConfig,
         Logger $logger,
+        ConfigReader $configReader,
         array $data = []
     ) {
         parent::__construct(
@@ -50,6 +52,7 @@ class Financing extends \Magento\Payment\Model\Method\AbstractMethod
         );
         $this->_scopeConfig = $scopeConfig;
         $this->_storeManager = $storeManager;
+        $this->config_reader = $configReader;
     }
 
     public function get_landing_config() {
@@ -59,7 +62,7 @@ class Financing extends \Magento\Payment\Model\Method\AbstractMethod
             $url = ConfigData::APURATA_DOMAIN.ConfigData::APURATA_LANDING_CONFIG;
             curl_setopt($ch, CURLOPT_URL, $url);
 
-            $secret_token = $this->_scopeConfig->getValue(ConfigData::SECRET_TOKEN_CONFIG_PATH, ScopeInterface::SCOPE_STORE);
+            $secret_token = $this->config_reader->getSecretToken();
             $headers = array("Authorization: Bearer " . $secret_token);
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
@@ -73,15 +76,22 @@ class Financing extends \Magento\Payment\Model\Method\AbstractMethod
 
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
-        if (!ConfigData::ALLOW_HTTP && $_SERVER['REQUEST_SCHEME'] != 'https') {
+        if (!$this->config_reader->allowHttp() && $_SERVER['REQUEST_SCHEME'] != 'https') {
+            error_log('Apurata solo soporta https');
             return False;
         }
-        if( $this->_storeManager->getStore()->getCurrentCurrency()->getCode() != 'PEN' ) {
+        $currency = $this->_storeManager->getStore()->getCurrentCurrency()->getCode();
+        if ($currency != 'PEN') {
+            error_log('Apurata sólo soporta currency=PEN. Currency actual=' . $currency);
             return False;
         }
         $landing_config = $this->get_landing_config();
-        if (!$landing_config || $quote->getGrandTotal() < $landing_config->min_amount || $quote->getGrandTotal() > $landing_config->max_amount) {
-            return False; 
+        if ($quote) {
+            $order_total = $quote->getGrandTotal();
+            if (!$landing_config || $order_total < $landing_config->min_amount || $order_total > $landing_config->max_amount) {
+                error_log('Apurata no financia el monto del carrito: ' . $order_total);
+                return False;
+            }
         }
         return True;
     }

@@ -26,7 +26,7 @@ class ConfigReader
     }
 
     public function allowHttp() {
-        return $this->scopeConfig->getValue('payment/apurata_financing/allow_http', ScopeInterface::SCOPE_STORE);
+        return (bool) $this->scopeConfig->getValue('payment/apurata_financing/allow_http', ScopeInterface::SCOPE_STORE);
     }
-    
+
 }
