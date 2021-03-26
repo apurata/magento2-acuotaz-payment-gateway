@@ -27,13 +27,12 @@ define(
                 self._super();
                 return self;
             },
-            
+
             /**
              * Initialize Apurata Financing element
              */
             initApurataFinancing: function () {
                 var config = window.checkoutConfig.payment[this.getCode()];
-                console.log(config);
                 if (!config) {
                     return;
                 }

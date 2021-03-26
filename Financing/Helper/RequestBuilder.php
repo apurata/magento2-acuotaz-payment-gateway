@@ -55,5 +55,5 @@ class RequestBuilder
         curl_close($ch);
         return array($httpCode, $ret);
     }
-    
+
 }

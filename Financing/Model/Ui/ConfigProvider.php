@@ -18,7 +18,7 @@ class ConfigProvider implements ConfigProviderInterface
         $this->configReader = $configReader;
         $this->urlHelper = $urlHelper;
     }
-    
+
     public function getConfig()
     {
         return [

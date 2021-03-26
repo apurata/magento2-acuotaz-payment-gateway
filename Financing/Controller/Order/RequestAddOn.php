@@ -8,35 +8,45 @@ use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory;
-
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableProduct;
+use Magento\Framework\App\ObjectManager as ObjectManager;
+use Apurata\Financing\Model\Financing;
 class RequestAddOn extends Action
 {
     public function __construct(
         Context $context,
         RequestBuilder $requestBuilder,
         Session $session,
-        JsonFactory $resultJsonFactory
+        JsonFactory $resultJsonFactory,
+        Financing $financing
     ) {
         $this->session = $session;
         $this->requestBuilder = $requestBuilder;
         $this->resultJsonFactory = $resultJsonFactory;
+        $this->financing = $financing;
         return parent::__construct($context);
     }
 
     public function execute()
     {
+        $resultJson = $this->resultJsonFactory->create();
+        if (!$this->financing->isAvailable()) {
+            return $resultJson->setData(['addon' => '']);
+        }
         $cart = $this->session->getQuote();
         $page = $this->getRequest()->getParam('page');
-        $url = ConfigData::APURATA_ADD_ON . urlencode($cart->getGrandTotal()) . '?page=' . $page;
-
+        $total = $cart->getGrandTotal();
+        $number_of_items = $cart->getItemsQty();
+        $url = ConfigData::APURATA_ADD_ON . urlencode($total) .'?page=' . $page;
+        if ($page =='cart' && $number_of_items > 1) {
+            $url .= '&multiple_products=' . urlencode('TRUE');
+        }
         list($respCode, $payWithApurataAddon) = $this->requestBuilder->makeCurlToApurata("GET", $url);
-			
 		if ($respCode == 200) {
             $addon = str_replace(array("\r", "\n"), '', $payWithApurataAddon);
 		} else {
             $addon = '';
 		}
-        $resultJson = $this->resultJsonFactory->create();
         return $resultJson->setData(['addon' => $addon]);
     }
 }
