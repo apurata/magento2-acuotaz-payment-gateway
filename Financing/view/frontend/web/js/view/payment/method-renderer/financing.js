@@ -33,7 +33,6 @@ define(
              */
             initApurataFinancing: function () {
                 var config = window.checkoutConfig.payment[this.getCode()];
-                console.log(config);
                 if (!config) {
                     return;
                 }

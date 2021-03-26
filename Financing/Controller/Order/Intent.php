@@ -46,7 +46,19 @@ class Intent extends Action
             '&customer_data__shipping_first_name='.urlencode($order->getShippingAddress()->getData('firstname')).
             '&customer_data__shipping_last_name='.urlencode($order->getShippingAddress()->getData('lastname')).
             '&customer_data__shipping_city='.urlencode($order->getShippingAddress()->getData('city'));
+        $dni = $this->get_dni_field_id($order);
+        if ($dni) {
+            $intentParams .= '&customer_data__dni='.urlencode($dni);
+        }
 
+        $this->checkoutSession->restoreQuote();
         $this->_redirect(ConfigData::APURATA_DOMAIN.ConfigData::APURATA_CREATE_ORDER_URL.$intentParams);
+    }
+    public function get_dni_field_id($order) {
+        $dni = $order->getBillingAddress()->getData('dni') ??
+        $order->getBillingAddress()->getData('DNI') ??
+        $order->getBillingAddress()->getData('Dni') ??
+        null;
+        return $dni;
     }
 }

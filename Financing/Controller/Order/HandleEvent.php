@@ -64,20 +64,33 @@ class HandleEvent extends Action
             $response->setData(['message' => __('Invalid authorization token')]);
             return $response;
         }
+        $comment = '';
         switch ($event) {
             case 'onhold':
-            case 'validated':
             case 'created':
-            case 'approved':
                 error_log('Evento ignorado por Apurata:' . $event);
                 break;
-            case 'rejected':
-                $order->cancel();
+            case 'validated':
+            case 'approved':
+                $comment = ($event == 'approved') ? 'Crédito aprobado por aCuotaz' : 'aCuotaz validó identidad';
                 break;
+            case 'rejected':
             case 'canceled':
+                if ($order->getStatus() != 'pending') {
+                    $response->setHttpResponseCode(Exception::HTTP_BAD_REQUEST);
+                    $response->setData(['message' => __('Status order not pending ')]);
+                    return $response;
+                }
+                $comment = ($event == 'rejected') ? 'rechazado' : 'cancelado';
                 $order->cancel();
                 break;
             case 'funded':
+                if ($order->getStatus() != 'pending') {
+                    $response->setHttpResponseCode(Exception::HTTP_BAD_REQUEST);
+                    $response->setData(['message' => __('Status order not pending')]);
+                    return $response;
+                }
+                $comment='aCuotaz notifica que esta orden fue pagada y ya se puede entregar';
                 $order->setState('processing')->setStatus('processing');
                 break;
             default:
@@ -85,6 +98,8 @@ class HandleEvent extends Action
                 $response->setData(['message' => __('Event not found')]);
                 return $response;
         }
+        if ($comment)
+            $order->addStatusHistoryComment(__($comment));
         $order->save();
         $response->setData(['message' => __('Request processed')]);
         return $response;

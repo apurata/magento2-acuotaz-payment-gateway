@@ -9,7 +9,8 @@ class ConfigData
     const KEY_APURATA_CLIENT_ID = 'apurata_client_id';
     const KEY_ACTIVE = 'active';
 
-    const APURATA_DOMAIN = 'http://localhost:8000';
+    const APURATA_DOMAIN = 'https://apurata.com';
+    const APURATA_STATIC_DOMAIN = 'https://static.apurata.com';
     const APURATA_LANDING_CONFIG = '/pos/client/landing_config';
     const APURATA_ADD_ON = '/pos/pay-with-apurata-add-on/';
     const APURATA_LANDING_VERSION = 'pos_generic';
