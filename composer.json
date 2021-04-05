@@ -1,0 +1,24 @@
+{
+    "name": "apurata/financing",
+    "description": "Apurata Magento 2 plugin",
+    "type": "magento2-component",
+    "require": {
+        "magento/magento-composer-installer": "*"
+    },
+    "version": "0.3.0",
+    "license": "OSL-3.0",
+    "authors": [
+        {
+            "name": "apurata",
+            "email": "pospro@apurata.com"
+        }
+    ],
+    "autoload": {
+        "files": [
+            "Financing/registration.php"
+        ],
+        "psr-4": {
+            "Apurata\\Financing\\": ""
+        }
+    }
+}
