@@ -15,10 +15,10 @@
     ],
     "autoload": {
         "files": [
-            "Financing/registration.php"
+            "Apurata/Financing/registration.php"
         ],
         "psr-4": {
-            "Apurata\\Financing\\": ""
+            "Apurata\\Financing\\": "Apurata/Financing"
         }
     }
 }
