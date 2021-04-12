@@ -27,15 +27,17 @@ class RequestAddOn extends Action
         return parent::__construct($context);
     }
 
-    public function execute()
-    {
+    public function execute() {
         $resultJson = $this->resultJsonFactory->create();
         if (!$this->financing->isAvailable()) {
             return $resultJson->setData(['addon' => '']);
         }
         $cart = $this->session->getQuote();
         $page = $this->getRequest()->getParam('page');
-        $total = $cart->getGrandTotal();
+        $total = $this->getRequest()->getParam('total');
+        if (!$total) {
+            $total = $cart->getGrandTotal();
+        }
         $number_of_items = $cart->getItemsQty();
         $url = ConfigData::APURATA_ADD_ON . urlencode($total) .'?page=' . $page;
         if ($page =='cart' && $number_of_items > 1) {
