@@ -7,25 +7,27 @@ define(
     function (Component, $, customerData) {
         'use strict';
         var total = "";
-        var id = "#acuotaz-add-on-minicart";
-        var cart = customerData.get('cart');
+        var id = ".acuotaz-add-on-minicart";
         try {
+            var cart = customerData.get('cart');
             var cart_data = customerData.get('cart-data');
             var count = cart().summary_count;
             var cart_total = cart().subtotalAmount;
-            var subtotal = cart_data().totals.grand_total;
         } catch (error) {}
+        // Update items in cart
         if (cart) {
             cart.subscribe(function () {
-                if (cart().summary_count !== count) {
+                if (cart().summary_count !== count || cart_data().totals.grand_total != cart_total) {
                     requestaddon();
                 }
             });
         }
-        if (cart_total) {
+        // Add estimate shipping
+        if (cart_data) {
             cart_data.subscribe(function () {
-                if (subtotal != cart_total) {
-                    total = "&total=" + cart_data().totals.grand_total;
+                var totals = cart_data().totals;
+                if (totals && totals.grand_total != cart_total) {
+                    total = "&total=" + totals.grand_total;
                     id = "#acuotaz-add-on-cart"
                     requestaddon();
                 }
