@@ -72,7 +72,7 @@ class HandleEvent extends Action
                 break;
             case 'validated':
             case 'approved':
-                $comment = ($event == 'approved') ? 'Crédito aprobado por aCuotaz' : 'aCuotaz validó identidad';
+                $comment = ($event == 'approved') ? 'Orden Calificada (Todavia no entregar producto)' : 'aCuotaz validó identidad';
                 break;
             case 'rejected':
             case 'canceled':
@@ -81,7 +81,7 @@ class HandleEvent extends Action
                     $response->setData(['message' => __('Status order not pending ')]);
                     return $response;
                 }
-                $comment = ($event == 'rejected') ? 'rechazado' : 'cancelado';
+                $comment = ($event == 'rejected') ? 'aCuotaz no aprobó el financiamiento' : 'El financiamiento en aCuotaz fue anulado';
                 $order->cancel();
                 break;
             case 'funded':
