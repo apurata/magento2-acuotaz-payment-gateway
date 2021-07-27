@@ -42,7 +42,7 @@ define(
                 this.apurataClientId = config.apurataClientId;
 
                 var r = new XMLHttpRequest();
-                r.open("GET", "https://apurata.com/pos" + this.apurataClientId + "/info-steps", true);
+                r.open("GET", "https://apurata.com/pos/" + this.apurataClientId + "/info-steps", true);
                 r.onreadystatechange = function () {
                 if (r.readyState != 4 || r.status != 200) return;
                 var elem = document.getElementById("apurata-pos-steps");
