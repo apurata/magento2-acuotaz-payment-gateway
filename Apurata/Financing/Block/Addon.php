@@ -24,6 +24,7 @@ class Addon extends \Magento\Framework\View\Element\Template
         $this->_registry = $registry;
         $this->requestBuilder = $requestBuilder;
         $this->financing = $financing;
+        $this->apurata_script = null;
         parent::__construct($context, $data);
 	}
 
@@ -87,24 +88,19 @@ class Addon extends \Magento\Framework\View\Element\Template
     }
 
     public function getApurataPixel() {
-        $path = '/vendor/pixels/apurata-pixel.txt';
-        $request_uri = ConfigData::APURATA_STATIC_DOMAIN . $path;
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $request_uri);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);    // seconds
-        curl_setopt($ch, CURLOPT_TIMEOUT, 2); // s
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPGET, true);
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-        if ($httpCode != 200) {
-            error_log(sprintf('Apurata responded with http_code %s', $httpCode));
+        $url = '/pos/apurata-pixel';
+        $apurata_script = null;
+        if ($this->apurata_script) {
+            return $this->apurata_script;
+        }
+        list($respCode, $apurata_script) = $this->requestBuilder->makeCurlToApurata("GET", $url);
+		if ($respCode == 200) {
+            $this->apurata_script = $apurata_script;
+            return $this->apurata_script;
+		} else {
+            error_log(sprintf('Apurata responded with http_code %s', $respCode));
             return '';
-        }
-        else{
-            return $response;
-        }
+		}
     }
 
 }
