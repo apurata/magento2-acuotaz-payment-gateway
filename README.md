@@ -2,15 +2,16 @@
 
 ## Installation
 - Get the plugin
-   * Direct Download, place the zip in (Magento dir)/app/code/:
 
-   https://github.com/apurata/magento2-acuotaz-payment-gateway/releases/download/0.3.4/Apurata.zip
-
-   * Using composer, execute in Magento directory:
+   Option 1: Using composer, execute in Magento directory:
    
    ```
     composer require apurata/financing:"0.3.*"
    ```
+   
+   Option 2: Direct Download, place the zip in (Magento dir)/app/code/:
+
+   https://github.com/apurata/magento2-acuotaz-payment-gateway/releases/download/0.3.4/Apurata.zip
   
 - Upgrade and compile page, to add apurata plugin:
 
