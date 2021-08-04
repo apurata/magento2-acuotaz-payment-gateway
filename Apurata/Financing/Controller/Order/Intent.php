@@ -18,18 +18,27 @@ class Intent extends Action
         Context $context,
         LoggerInterface $logger,
         CheckoutSession $checkoutSession,
-        UrlInterface $urlBuilder
+        UrlInterface $urlBuilder,
+        \Magento\Customer\Model\Session $customerSession2
     ) {
         $this->logger = $logger;
         $this->checkoutSession = $checkoutSession;
         $this->urlBuilder = $urlBuilder;
+        $this->customerSession2=$customerSession2;
         return parent::__construct($context);
     }
 
     public function execute()
     {
         $order = $this->checkoutSession->getLastRealOrder();
-
+        try{
+            if(!$this->customerSession2->getApurataId()){
+                $this->customerSession2->setApurataId($this->customerSession2->getSessionId());
+            }
+        }catch(\Throwable $e){
+            error_log('Error:can not get session_id');
+        }
+        $session_id = $this->customerSession2->getApurataId();
         $intentParams = '?pos_client_id='.$this->getRequest()->getParam('pos_client_id').
             '&order_id='.urlencode($order->getId()).
             '&amount='.urlencode($order->getGrandTotal()).
@@ -45,7 +54,8 @@ class Intent extends Action
             '&customer_data__shipping_address_1='.urlencode($order->getShippingAddress()->getData('street')).
             '&customer_data__shipping_first_name='.urlencode($order->getShippingAddress()->getData('firstname')).
             '&customer_data__shipping_last_name='.urlencode($order->getShippingAddress()->getData('lastname')).
-            '&customer_data__shipping_city='.urlencode($order->getShippingAddress()->getData('city'));
+            '&customer_data__shipping_city='.urlencode($order->getShippingAddress()->getData('city')).
+            '&customer_data__session_id='.urldecode($session_id);
         $dni = $this->get_dni_field_id($order);
         if ($dni) {
             $intentParams .= '&customer_data__dni='.urlencode($dni);
