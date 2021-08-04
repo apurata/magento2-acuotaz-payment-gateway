@@ -13,6 +13,7 @@ class Addon extends \Magento\Framework\View\Element\Template
         \Magento\Framework\UrlInterface $urlBuilder,
         \Magento\Checkout\Model\SessionFactory $session,
         \Magento\Customer\Model\SessionFactory $customerSession,
+        \Magento\Customer\Model\Session $customerSession2,
         \Magento\Framework\Registry $registry,
         RequestBuilder $requestBuilder,
         Financing $financing,
@@ -25,6 +26,7 @@ class Addon extends \Magento\Framework\View\Element\Template
         $this->requestBuilder = $requestBuilder;
         $this->financing = $financing;
         $this->apurata_script = null;
+        $this->customerSession2=$customerSession2;
         parent::__construct($context, $data);
 	}
 
@@ -61,6 +63,14 @@ class Addon extends \Magento\Framework\View\Element\Template
             '?page=' . urlencode($page) .
             '&continue_url=' . urlencode($current_url)
         ;
+        try{
+            if(!$this->customerSession2->getApurataId()){
+                $this->customerSession2->setApurataId($this->customerSession2->getSessionId());
+            }
+        }catch(\Throwable $e){
+            error_log('Error:can not get session_id');
+        }
+        $session_id = $this->customerSession2->getApurataId();
         if ($page =='cart' && $number_of_items > 1) {
             $url .= '&multiple_products=' . urlencode('TRUE');
         }
@@ -77,6 +87,9 @@ class Addon extends \Magento\Framework\View\Element\Template
                 $url .= '&user__first_name=' . urlencode($current_user->getName());
             if($current_user->getLastname())
                 $url .= '&user__last_name=' . urlencode($current_user->getLastname());
+        }
+        if($session_id) {
+            $url .= '&user__session_id=' . urlencode($session_id);
         }
         list($respCode, $payWithApurataAddon) = $this->requestBuilder->makeCurlToApurata("GET", $url);
 		if ($respCode == 200) {
