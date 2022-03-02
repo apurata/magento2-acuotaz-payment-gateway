@@ -17,6 +17,7 @@ define(
         // Update items in cart
         if (cart) {
             cart.subscribe(function () {
+                if (cart_data().totals === undefined || cart_data().totals === null) return;
                 if (cart().summary_count !== count || cart_data().totals.grand_total != cart_total) {
                     requestaddon();
                 }

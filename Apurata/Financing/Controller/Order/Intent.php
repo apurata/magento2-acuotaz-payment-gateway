@@ -6,9 +6,7 @@ use Psr\Log\LoggerInterface;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Checkout\Model\Session as CheckoutSession;
-use Magento\Framework\App\ObjectManager;
 use Magento\Framework\UrlInterface;
-use Magento\Framework\Controller\ResultFactory;
 use Apurata\Financing\Helper\ConfigData;
 
 
@@ -44,22 +42,26 @@ class Intent extends Action
             '&amount='.urlencode($order->getGrandTotal()).
             '&url_redir_on_canceled='.urlencode(rtrim($this->urlBuilder->getUrl(ConfigData::FINANCING_FAIL_URL), '/')).
             '&url_redir_on_rejected='.urlencode(rtrim($this->urlBuilder->getUrl(ConfigData::FINANCING_FAIL_URL), '/')).
-            '&url_redir_on_success='.urlencode(rtrim($this->urlBuilder->getUrl(ConfigData::FINANCING_SUCCESS_URL . $order->getId()), '/')).
-            '&customer_data__email='.urlencode($order->getBillingAddress()->getData('email')).
-            '&customer_data__phone='.urlencode($order->getBillingAddress()->getData('telephone')).
-            '&customer_data__billing_address_1='.urlencode($order->getBillingAddress()->getData('street')) .
-            '&customer_data__billing_first_name='.urlencode($order->getBillingAddress()->getData('firstname')).
-            '&customer_data__billing_last_name='.urlencode($order->getBillingAddress()->getData('lastname')).
-            '&customer_data__billing_city='.urlencode($order->getBillingAddress()->getData('city')).
-            '&customer_data__shipping_address_1='.urlencode($order->getShippingAddress()->getData('street')).
-            '&customer_data__shipping_first_name='.urlencode($order->getShippingAddress()->getData('firstname')).
-            '&customer_data__shipping_last_name='.urlencode($order->getShippingAddress()->getData('lastname')).
-            '&customer_data__shipping_city='.urlencode($order->getShippingAddress()->getData('city')).
-            '&customer_data__session_id='.urldecode($session_id);
-        $dni = $this->get_dni_field_id($order);
-        if ($dni) {
-            $intentParams .= '&customer_data__dni='.urlencode($dni);
+            '&url_redir_on_success='.urlencode(rtrim($this->urlBuilder->getUrl(ConfigData::FINANCING_SUCCESS_URL . $order->getId()), '/'));
+        $billing_address = $order->getBillingAddress();
+        if ($billing_address) {
+            $intentParams .= '&customer_data__email='.urlencode($billing_address->getData('email')).
+            '&customer_data__phone='.urlencode($billing_address->getData('telephone')).
+            '&customer_data__billing_address_1='.urlencode($billing_address->getData('street')).
+            '&customer_data__billing_first_name='.urlencode($billing_address->getData('firstname')).
+            '&customer_data__billing_last_name='.urlencode($billing_address->getData('lastname')).
+            '&customer_data__billing_city='.urlencode($billing_address->getData('city'));
         }
+        $shipping_address = $order->getShippingAddress();
+        if ($shipping_address){
+            $intentParams .= '&customer_data__shipping_address_1='.urlencode($shipping_address->getData('street')).
+            '&customer_data__shipping_first_name='.urlencode($shipping_address->getData('firstname')).
+            '&customer_data__shipping_last_name='.urlencode($shipping_address->getData('lastname')).
+            '&customer_data__shipping_city='.urlencode($shipping_address->getData('city')).
+            '&customer_data__dni='.urlencode($this->get_dni_field_id($order));
+        }
+        $intentParams .= '&customer_data__session_id='.urldecode($session_id);
+
 
         $this->checkoutSession->restoreQuote();
         $this->_redirect(ConfigData::APURATA_DOMAIN.ConfigData::APURATA_CREATE_ORDER_URL.$intentParams);
@@ -68,7 +70,7 @@ class Intent extends Action
         $dni = $order->getBillingAddress()->getData('dni') ??
         $order->getBillingAddress()->getData('DNI') ??
         $order->getBillingAddress()->getData('Dni') ??
-        null;
+        '';
         return $dni;
     }
 }
