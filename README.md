@@ -11,7 +11,7 @@
    
    Option 2: Direct Download, place the zip in (Magento dir)/app/code/:
 
-   https://github.com/apurata/magento2-acuotaz-payment-gateway/releases/download/0.3.4/Apurata.zip
+   [Link de descarga](https://github.com/apurata/magento2-acuotaz-payment-gateway/archive/refs/tags/0.3.6.zip)
   
 - Upgrade and compile page, to add apurata plugin:
 
