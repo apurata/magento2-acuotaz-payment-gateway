@@ -8,9 +8,8 @@ use Magento\Store\Model\ScopeInterface;
 class ConfigReader
 {
     public function __construct(
-        ScopeConfigInterface $scopeConfig
+        private ScopeConfigInterface $scopeConfig
     ) {
-        $this->scopeConfig = $scopeConfig;
     }
 
     public function getIsActive() {

@@ -18,15 +18,11 @@ class HandleEvent extends Action
 {
     public function __construct(
         Context $context,
-        Cart $cart,
-        ScopeConfigInterface $scopeConfig,
-        Order $order,
-        OrderManagementInterface $orderManagement
+        private Cart $cart,
+        private ScopeConfigInterface $scopeConfig,
+        private Order $order,
+        private OrderManagementInterface $orderManagement
     ) {
-        $this->cart = $cart;
-        $this->scopeConfig = $scopeConfig;
-        $this->order = $order;
-        $this->orderManagement = $orderManagement;
         return parent::__construct($context);
     }
 

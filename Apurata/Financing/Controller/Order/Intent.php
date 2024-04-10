@@ -14,15 +14,11 @@ class Intent extends Action
 {
     public function __construct(
         Context $context,
-        LoggerInterface $logger,
-        CheckoutSession $checkoutSession,
-        UrlInterface $urlBuilder,
-        \Magento\Customer\Model\Session $customerSession2
+        private LoggerInterface $logger,
+        private CheckoutSession $checkoutSession,
+        private UrlInterface $urlBuilder,
+        private \Magento\Customer\Model\Session $customerSession2
     ) {
-        $this->logger = $logger;
-        $this->checkoutSession = $checkoutSession;
-        $this->urlBuilder = $urlBuilder;
-        $this->customerSession2=$customerSession2;
         return parent::__construct($context);
     }
 

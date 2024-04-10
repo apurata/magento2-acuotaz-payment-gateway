@@ -12,11 +12,9 @@ class ConfigProvider implements ConfigProviderInterface
     const CODE = ConfigData::PAYMENT_CODE;
 
     public function __construct(
-        ConfigReader $configReader,
-        UrlInterface $urlHelper
+        private ConfigReader $configReader,
+        private UrlInterface $urlHelper
     ) {
-        $this->configReader = $configReader;
-        $this->urlHelper = $urlHelper;
     }
 
     public function getConfig()

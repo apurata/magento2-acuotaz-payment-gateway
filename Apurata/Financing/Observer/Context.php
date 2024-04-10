@@ -9,13 +9,10 @@ use Magento\Framework\Module\ModuleListInterface;
 
 class Context implements ObserverInterface {
     public function __construct(
-        RequestBuilder $requestBuilder,
-        ProductMetadataInterface $productMetadata,
-        ModuleListInterface $moduleList
+        private RequestBuilder $requestBuilder,
+        private ProductMetadataInterface $productMetadata,
+        private ModuleListInterface $moduleList
     ) {
-        $this->requestBuilder = $requestBuilder;
-        $this->productMetadata = $productMetadata;
-        $this->_moduleList = $moduleList;
     }
     /**
      * @param \Magento\Framework\Event\Observer $observer
@@ -25,7 +22,7 @@ class Context implements ObserverInterface {
         try{
             $client_id = $this->requestBuilder->configReader->getClientId();
             $mangento_version  = $this->productMetadata->getVersion();
-            $plugin_version = $this->_moduleList->getOne('Apurata_Financing')['setup_version'];
+            $plugin_version = $this->moduleList->getOne('Apurata_Financing')['setup_version'];
             $url = "/pos/client/" . $client_id . "/context";
             $this->requestBuilder->makeCurlToApurata("POST", $url, array(
                 "php_version"         => phpversion(),

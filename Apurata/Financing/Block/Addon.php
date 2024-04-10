@@ -8,30 +8,23 @@ use Exception;
 
 class Addon extends \Magento\Framework\View\Element\Template
 {
+    private $apurata_script = null;
     public function __construct (
-        \Magento\Framework\View\Element\Template\Context $context,
-        \Magento\Framework\UrlInterface $urlBuilder,
-        \Magento\Checkout\Model\SessionFactory $session,
-        \Magento\Customer\Model\SessionFactory $customerSession,
-        \Magento\Customer\Model\Session $customerSession2,
-        \Magento\Framework\Registry $registry,
-        RequestBuilder $requestBuilder,
-        Financing $financing,
-        array $data = []
+        private \Magento\Framework\View\Element\Template\Context $context,
+        private \Magento\Framework\UrlInterface $urlBuilder,
+        private \Magento\Checkout\Model\SessionFactory $session,
+        private \Magento\Customer\Model\SessionFactory $customerSession,
+        private \Magento\Customer\Model\Session $customerSession2,
+        private \Magento\Framework\Registry $registry,
+        private RequestBuilder $requestBuilder,
+        private Financing $financing,
+        private array $data = []
     ) {
-        $this->_urlBuilder = $urlBuilder;
-        $this->session = $session;
-        $this->customerSession = $customerSession;
-        $this->_registry = $registry;
-        $this->requestBuilder = $requestBuilder;
-        $this->financing = $financing;
-        $this->apurata_script = null;
-        $this->customerSession2=$customerSession2;
         parent::__construct($context, $data);
 	}
 
     public function getCurrentProduct() {
-        return $this->_registry->registry('current_product');
+        return $this->registry->registry('current_product');
     }
 
     public function getApurataAddon($page) {
@@ -41,7 +34,7 @@ class Addon extends \Magento\Framework\View\Element\Template
         $cart = $this->session->create()->getQuote();
         $total = $cart->getGrandTotal();
         $product = $this->getCurrentProduct();
-        $current_url = $this->_urlBuilder->getCurrentUrl();
+        $current_url = $this->urlBuilder->getCurrentUrl();
         try{
             if ($page == 'product' && $product) {
                 $total = $product->getFinalPrice();

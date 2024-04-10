@@ -6,12 +6,10 @@ use Apurata\Financing\Helper\ConfigReader;
 use Apurata\Financing\Helper\ConfigData;
 
 
-class RequestBuilder
-{
+class RequestBuilder {
     public function __construct(
-        ConfigReader $configReader
+        private ConfigReader $configReader
     ) {
-        $this->configReader = $configReader;
     }
 
     public function makeCurlToApurata($method, $path, $data=null, $fire_and_forget=false) {

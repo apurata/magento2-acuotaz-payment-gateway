@@ -11,9 +11,8 @@ class Cancelation extends Action
 {
     public function __construct(
         Context $context,
-        CheckoutSession $checkoutSession
+        private CheckoutSession $checkoutSession
     ) {
-        $this->checkoutSession = $checkoutSession;
         return parent::__construct($context);
     }
 
