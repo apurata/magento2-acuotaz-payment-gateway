@@ -6,12 +6,12 @@
    Option 1: Using composer, execute in Magento directory:
    
    ```
-    composer require apurata/financing:"0.3.*"
+    composer require apurata/financing:"0.4.*"
    ```
    
    Option 2: Direct Download, place the zip in (Magento dir)/app/code/:
 
-   [Link de descarga](https://github.com/apurata/magento2-acuotaz-payment-gateway/archive/refs/tags/0.3.6.zip)
+   [Link de descarga](https://github.com/apurata/magento2-acuotaz-payment-gateway/archive/refs/tags/0.4.0.zip)
   
 - Upgrade and compile page, to add apurata plugin:
 
