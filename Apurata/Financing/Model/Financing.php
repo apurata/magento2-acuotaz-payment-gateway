@@ -55,13 +55,13 @@ class Financing extends \Magento\Payment\Model\Method\AbstractMethod
         $this->config_reader = $configReader;
     }
 
-    public function get_landing_config() {
+    public function get_landing_config()
+    {
         if (!$this->landing_config) {
             $ch = curl_init();
 
-            $url = ConfigData::APURATA_DOMAIN.ConfigData::APURATA_LANDING_CONFIG;
+            $url = ConfigData::APURATA_DOMAIN . ConfigData::APURATA_LANDING_CONFIG;
             curl_setopt($ch, CURLOPT_URL, $url);
-
             $secret_token = $this->config_reader->getSecretToken();
             $headers = array("Authorization: Bearer " . $secret_token);
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);

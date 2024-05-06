@@ -9,7 +9,7 @@ use Magento\Sales\Model\Order;
 use Magento\Framework\Webapi\Exception;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Checkout\Model\Cart;
-use Magento\Sales\Api\OrderManagementInterface ;
+use Magento\Sales\Api\OrderManagementInterface;
 use Magento\Store\Model\ScopeInterface;
 use Apurata\Financing\Helper\ConfigData;
 
@@ -47,7 +47,7 @@ class HandleEvent extends Action
             return $response;
         }
         list($auth_type, $token) = explode(' ', $auth);
-        if (strtolower($auth_type) != 'bearer'){
+        if (strtolower($auth_type) != 'bearer') {
             $response->setHttpResponseCode(Exception::HTTP_BAD_REQUEST);
             $response->setData(['message' => __('Invalid authorization type')]);
             return $response;
@@ -86,7 +86,7 @@ class HandleEvent extends Action
                     $response->setData(['message' => __('Status order not pending')]);
                     return $response;
                 }
-                $comment='aCuotaz notifica que esta orden fue pagada y ya se puede entregar';
+                $comment = 'aCuotaz notifica que esta orden fue pagada y ya se puede entregar';
                 $order->setState('processing')->setStatus('processing');
                 break;
             default:
