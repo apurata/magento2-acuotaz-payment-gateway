@@ -6,13 +6,15 @@ use Apurata\Financing\Helper\ConfigReader;
 use Apurata\Financing\Helper\ConfigData;
 
 
-class RequestBuilder {
+class RequestBuilder
+{
     public function __construct(
         private ConfigReader $configReader
     ) {
     }
 
-    public function makeCurlToApurata($method, $path, $data=null, $fire_and_forget=false) {
+    public function makeCurlToApurata($method, $path, $data = null, $fire_and_forget = false)
+    {
         $ch = curl_init();
         $url = ConfigData::APURATA_DOMAIN . $path;
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -53,5 +55,4 @@ class RequestBuilder {
         curl_close($ch);
         return array($httpCode, $ret);
     }
-
 }

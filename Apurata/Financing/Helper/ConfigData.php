@@ -14,7 +14,7 @@ class ConfigData
     const APURATA_LANDING_CONFIG = '/pos/client/landing_config';
     const APURATA_ADD_ON = '/pos/pay-with-apurata-add-on/';
     const APURATA_LANDING_VERSION = 'pos_generic';
-    const APURATA_CREATE_ORDER_URL = '/pos/crear-orden-y-continuar';
+    const APURATA_CREATE_ORDER_URL = '/pos/order/create';
 
     const FINANCING_INTENT_PATH = 'apuratafinancing/order/intent';
     const FINANCING_ADD_ON_PATH = 'apuratafinancing/order/requestaddon';

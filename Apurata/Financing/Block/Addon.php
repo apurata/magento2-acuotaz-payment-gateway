@@ -1,4 +1,5 @@
 <?php
+
 namespace Apurata\Financing\Block;
 
 use Apurata\Financing\Helper\ConfigData;
@@ -9,7 +10,7 @@ use Exception;
 class Addon extends \Magento\Framework\View\Element\Template
 {
     private $apurata_script = null;
-    public function __construct (
+    public function __construct(
         private \Magento\Framework\View\Element\Template\Context $context,
         private \Magento\Framework\UrlInterface $urlBuilder,
         private \Magento\Checkout\Model\SessionFactory $session,
@@ -21,92 +22,86 @@ class Addon extends \Magento\Framework\View\Element\Template
         private array $data = []
     ) {
         parent::__construct($context, $data);
-	}
+    }
 
-    public function getCurrentProduct() {
+    public function getCurrentProduct()
+    {
         return $this->registry->registry('current_product');
     }
 
-    public function getApurataAddon($page) {
+    private function getSessionId()
+    {
+        $sessionId = '';
+        try {
+            $sessionId = $this->customerSession2->getApurataId() ?: $this->customerSession2->getSessionId();
+            $this->customerSession2->setApurataId($sessionId);
+        } catch (\Throwable $e) {
+            error_log('Apurata Log: can not get session_id');
+        }
+        return $sessionId;
+    }
+
+    private function getUrlParams($page, $cart, $product)
+    {
+        $current_user = $this->customerSession->create()->getCustomer();
+        $urlParams = [
+            'page' => $page,
+            'continue_url' => $this->urlBuilder->getCurrentUrl(),
+            'multiple_products' => ($page === 'cart' && $cart->getItemsQty() > 1) ? 'TRUE' : null,
+            'product__id' => $product ? $product->getId() : null,
+            'product__name' => $product ? $product->getName() : null,
+            'user__id' => $current_user ? $current_user->getId() : null,
+            'user__email' => $current_user ? $current_user->getEmail() : null,
+            'user__first_name' => $current_user ? $current_user->getName() : null,
+            'user__last_name' => $current_user ? $current_user->getLastname() : null,
+            'user__session_id' => $this->getSessionId(),
+        ];
+        return array_filter($urlParams, fn ($value) => $value !== null);
+    }
+
+    private function getApurataAddonInsecure($page)
+    {
         if (!$this->financing->isAvailable()) {
             return '';
         }
         $cart = $this->session->create()->getQuote();
-        $total = $cart->getGrandTotal();
         $product = $this->getCurrentProduct();
-        $current_url = $this->urlBuilder->getCurrentUrl();
-        try{
-            if ($page == 'product' && $product) {
-                $total = $product->getFinalPrice();
-            } else {
-                $total = $cart->getGrandTotal();
-            }
-            $number_of_items = $cart->getItemsQty();
-            $url = ConfigData::APURATA_ADD_ON . urlencode($total);
-            $current_user = $this->customerSession->create()->getCustomer();
-        } catch (\Throwable $e){
-            error_log(sprintf("%s in file : %s line: %s",
+        $total = ($page == 'product' && $product) ? $product->getFinalPrice() : $cart->getGrandTotal();
+        $urlParams = $this->getUrlParams($page, $cart, $product);
+        $url = ConfigData::APURATA_ADD_ON . urlencode($total) . '?' . http_build_query(array_map('urlencode', $urlParams));
+        list($respCode, $payWithApurataAddon) = $this->requestBuilder->makeCurlToApurata("GET", $url);
+        $addon = ($respCode == 200) ? str_replace(array("\r", "\n"), '', $payWithApurataAddon) : '';
+        return $addon;
+    }
+    public function getApurataAddon($page)
+    {
+        try {
+            return $this->getApurataAddonInsecure($page);
+        } catch (\Throwable $e) {
+            error_log(sprintf(
+                "Apurata log: %s in file : %s line: %s",
                 $e->getMessage(),
                 $e->getFile(),
                 $e->getLine()
             ));
-            return '';
         }
-        $url .=
-            '?page=' . urlencode($page) .
-            '&continue_url=' . urlencode($current_url)
-        ;
-        try{
-            if(!$this->customerSession2->getApurataId()){
-                $this->customerSession2->setApurataId($this->customerSession2->getSessionId());
-            }
-        }catch(\Throwable $e){
-            error_log('Error:can not get session_id');
-        }
-        $session_id = $this->customerSession2->getApurataId();
-        if ($page =='cart' && $number_of_items > 1) {
-            $url .= '&multiple_products=' . urlencode('TRUE');
-        }
-        if ($product) {
-            $url .= '&product__id=' . urlencode($product->getId()) .
-                '&product__name=' . urlencode($product->getName());
-        }
-        if ($current_user) {
-            if($current_user->getId())
-                $url .= '&user__id=' . urlencode($current_user->getId());
-            if($current_user->getEmail())
-                $url .= '&user__email=' . urlencode($current_user->getEmail());
-            if($current_user->getName())
-                $url .= '&user__first_name=' . urlencode($current_user->getName());
-            if($current_user->getLastname())
-                $url .= '&user__last_name=' . urlencode($current_user->getLastname());
-        }
-        if($session_id) {
-            $url .= '&user__session_id=' . urlencode($session_id);
-        }
-        list($respCode, $payWithApurataAddon) = $this->requestBuilder->makeCurlToApurata("GET", $url);
-		if ($respCode == 200) {
-            $addon = str_replace(array("\r", "\n"), '', $payWithApurataAddon);
-		} else {
-            $addon = '';
-		}
-        return $addon;
+        return '';
     }
 
-    public function getApurataPixel() {
+    public function getApurataPixel()
+    {
         $url = '/pos/apurata-pixel';
         $apurata_script = null;
         if ($this->apurata_script) {
             return $this->apurata_script;
         }
         list($respCode, $apurata_script) = $this->requestBuilder->makeCurlToApurata("GET", $url);
-		if ($respCode == 200) {
+        if ($respCode == 200) {
             $this->apurata_script = $apurata_script;
             return $this->apurata_script;
-		} else {
+        } else {
             error_log(sprintf('Apurata responded with http_code %s', $respCode));
             return '';
-		}
+        }
     }
-
 }

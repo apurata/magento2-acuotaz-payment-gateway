@@ -7,7 +7,8 @@ use Apurata\Financing\Helper\RequestBuilder;
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\Module\ModuleListInterface;
 
-class Context implements ObserverInterface {
+class Context implements ObserverInterface
+{
     public function __construct(
         private RequestBuilder $requestBuilder,
         private ProductMetadataInterface $productMetadata,
@@ -19,7 +20,7 @@ class Context implements ObserverInterface {
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
-        try{
+        try {
             $client_id = $this->requestBuilder->configReader->getClientId();
             $mangento_version  = $this->productMetadata->getVersion();
             $plugin_version = $this->moduleList->getOne('Apurata_Financing')['setup_version'];
@@ -29,13 +30,13 @@ class Context implements ObserverInterface {
                 "magento_version"   => $mangento_version,
                 "mg_acuotaz_version"  => $plugin_version,
             ), TRUE);
-        } catch (\Throwable $e){
-            error_log(sprintf("%s in file : %s line: %s",
+        } catch (\Throwable $e) {
+            error_log(sprintf(
+                "%s in file : %s line: %s",
                 $e->getMessage(),
                 $e->getFile(),
                 $e->getLine()
             ));
         }
     }
-
 }

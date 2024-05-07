@@ -12,20 +12,23 @@ class ConfigReader
     ) {
     }
 
-    public function getIsActive() {
+    public function getIsActive()
+    {
         return (bool) $this->scopeConfig->getValue('payment/apurata_financing/active', ScopeInterface::SCOPE_STORE);
     }
 
-    public function getSecretToken() {
+    public function getSecretToken()
+    {
         return $this->scopeConfig->getValue('payment/apurata_financing/secret_token', ScopeInterface::SCOPE_STORE);
     }
 
-    public function getClientId() {
+    public function getClientId()
+    {
         return $this->scopeConfig->getValue('payment/apurata_financing/apurata_client_id', ScopeInterface::SCOPE_STORE);
     }
 
-    public function allowHttp() {
+    public function allowHttp()
+    {
         return (bool) $this->scopeConfig->getValue('payment/apurata_financing/allow_http', ScopeInterface::SCOPE_STORE);
     }
-
 }

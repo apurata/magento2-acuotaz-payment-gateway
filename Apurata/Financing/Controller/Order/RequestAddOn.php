@@ -9,6 +9,7 @@ use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Apurata\Financing\Model\Financing;
+
 class RequestAddOn extends Action
 {
     public function __construct(
@@ -21,7 +22,8 @@ class RequestAddOn extends Action
         return parent::__construct($context);
     }
 
-    public function execute() {
+    public function execute()
+    {
         $resultJson = $this->resultJsonFactory->create();
         if (!$this->financing->isAvailable()) {
             return $resultJson->setData(['addon' => '']);
@@ -33,16 +35,16 @@ class RequestAddOn extends Action
             $total = $cart->getGrandTotal();
         }
         $number_of_items = $cart->getItemsQty();
-        $url = ConfigData::APURATA_ADD_ON . urlencode($total) .'?page=' . $page;
-        if ($page =='cart' && $number_of_items > 1) {
+        $url = ConfigData::APURATA_ADD_ON . urlencode($total) . '?page=' . $page;
+        if ($page == 'cart' && $number_of_items > 1) {
             $url .= '&multiple_products=' . urlencode('TRUE');
         }
         list($respCode, $payWithApurataAddon) = $this->requestBuilder->makeCurlToApurata("GET", $url);
-		if ($respCode == 200) {
+        if ($respCode == 200) {
             $addon = str_replace(array("\r", "\n"), '', $payWithApurataAddon);
-		} else {
+        } else {
             $addon = '';
-		}
+        }
         return $resultJson->setData(['addon' => $addon]);
     }
 }
