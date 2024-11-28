@@ -10,10 +10,9 @@ class RequestBuilder
 {
     public function __construct(
         private ConfigReader $configReader
-    ) {
-    }
+    ) {}
 
-    public function makeCurlToApurata($method, $path, $data = null, $fire_and_forget = false)
+    public function makeCurlToApurata($method, $path, $data = null, $fire_and_forget = false, $extra_headers = [])
     {
         $ch = curl_init();
         $url = ConfigData::APURATA_DOMAIN . $path;
@@ -23,6 +22,7 @@ class RequestBuilder
         curl_setopt($ch, CURLOPT_TIMEOUT, 2); // seconds
 
         $headers = array('Authorization: Bearer ' . $this->configReader->getSecretToken());
+        $headers = array_merge($headers, $extra_headers);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
         if (strtoupper($method) == "GET") {
