@@ -3,7 +3,7 @@
 ## Installation
 - Get the plugin
 
-   Option 1: Using composer, execute in Magento directory:
+   Option 1: Using composer, execute in Magento directory (recommended):
    
    ```
     composer require apurata/financing:"0.4.*"
@@ -44,13 +44,13 @@
    ```
     magento module:enable Apurata_Financing --clear-static-content
    ```
- 
-- If you have permission problems:
 
-```
-    chmod 777 -R var/ pub/ generated/
-```
+## Update to the latest version
 
+- Use composer:
+```
+composer update apurata/financing
+```
 ## Configuration
 
 1. On the Admin sidebar, click Stores > Settings > Configuration.
