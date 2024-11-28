@@ -39,8 +39,8 @@ class Intent extends Action
             error_log(sprintf('Apurata log: Error al crear orden http_code %s', $respCode));
             $objectManager = ObjectManager::getInstance();
             $messageManager = $objectManager->get('Magento\Framework\Message\ManagerInterface');
-            $messageManager->addError('Hubo un error al procesar el pago con aCuotaz. Por favor, inténtelo de nuevo más tarde.');
-            $this->_redirect($this->urlBuilder->getBaseUrl());
+            $messageManager->addErrorMessage('Hubo un error al procesar el pago con aCuotaz. Por favor, inténtelo de nuevo más tarde.');
+            $this->_redirect($this->urlBuilder->getUrl('checkout'));
         }
     }
 
