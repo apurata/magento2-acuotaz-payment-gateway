@@ -3,4 +3,7 @@
     <event name="admin_system_config_changed_section_payment">
         <observer name="apurata-context" instance="Apurata\Financing\Observer\Context" />
     </event>
+    <event name="sales_order_creditmemo_save_after">
+        <observer name="apurata_refund_observer" instance="Apurata\Financing\Observer\RefundObserver" />
+    </event>
 </config>
