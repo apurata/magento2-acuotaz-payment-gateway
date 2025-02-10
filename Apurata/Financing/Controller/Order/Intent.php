@@ -72,6 +72,7 @@ class Intent extends Action
             'shipping_city' => $shippingAddress->getData('city'),
             'dni' => $this->getDniFieldId($order),
             'session_id' => $this->customerSession2->getApurataId(),
+            'merchant_reference' => $order->getIncrementId(),
         ];
         $intentParams = [
             'pos_client_id' => $this->getRequest()->getParam('pos_client_id'),
@@ -79,7 +80,7 @@ class Intent extends Action
             'amount' => $order->getGrandTotal(),
             'url_redir_on_canceled' => rtrim($this->urlBuilder->getUrl(ConfigData::FINANCING_FAIL_URL), '/'),
             'url_redir_on_rejected' => rtrim($this->urlBuilder->getUrl(ConfigData::FINANCING_FAIL_URL), '/'),
-            'url_redir_on_success' => rtrim($this->urlBuilder->getUrl(ConfigData::FINANCING_SUCCESS_URL . $order->getId()), '/'),
+            'url_redir_on_success' => rtrim($this->urlBuilder->getUrl(ConfigData::FINANCING_SUCCESS_URL . '?order_id=' . $order->getId()), '/'),
             'customer_data' => $customerData,
         ];
         return $intentParams;
