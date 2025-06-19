@@ -31,4 +31,9 @@ class ConfigReader
     {
         return (bool) $this->scopeConfig->getValue('payment/apurata_financing/allow_http', ScopeInterface::SCOPE_STORE);
     }
+
+    public function getSentryDsn()
+    {
+        return $this->scopeConfig->getValue('payment/apurata_financing/sentry_dsn', ScopeInterface::SCOPE_STORE);
+    }
 }
