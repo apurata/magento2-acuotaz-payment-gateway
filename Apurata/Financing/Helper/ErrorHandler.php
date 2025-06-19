@@ -14,6 +14,11 @@ class ErrorHandler
         private ModuleListInterface $moduleList
     ) {}
 
+    /**
+     * Decorator that wraps functions in a try-catch to prevent plugin errors from affecting the store.
+     * It logs exceptions, sends them to Sentry, and returns a default value instead of crashing Magento.
+     * This is typically used in plugin entrypoints such as controller execute() methods.
+     */
     public function neverRaise(callable $callback, string $context = '', $defaultValue = null)
     {
         try {
@@ -90,7 +95,9 @@ class ErrorHandler
     public function unsafeSendToSentry(string $message, ?\Throwable $exception = null, $apiContext = null): void
     {
         $dsn = $this->configReader->getSentryDsn();
-        if (!$dsn) { return; }
+        if (!$dsn) {
+            return;
+        }
         $parsed = parse_url($dsn);
         $endpoint = "https://{$parsed['host']}/api/" . ltrim($parsed['path'], '/') . "/store/";
         $payload = $this->getSentryPayload($message);
