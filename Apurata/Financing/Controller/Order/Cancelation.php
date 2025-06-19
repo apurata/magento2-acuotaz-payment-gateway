@@ -22,6 +22,6 @@ class Cancelation extends Action
         return $this->errorHandler->neverRaise(function () {
             $this->checkoutSession->restoreQuote();
             $this->_redirect('checkout', ['_fragment' => 'payment']);
-        });
+        }, 'Cancelation');
     }
 }

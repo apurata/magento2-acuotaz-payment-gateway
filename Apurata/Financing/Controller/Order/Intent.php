@@ -43,7 +43,7 @@ class Intent extends Action
                 $messageManager->addErrorMessage('Hubo un error al procesar el pago con aCuotaz. Por favor, inténtelo de nuevo más tarde.');
                 $this->_redirect($this->urlBuilder->getUrl('checkout'));
             }
-        });
+        }, 'CreateOrder');
     }
 
     private function handleApurataId()
@@ -79,9 +79,9 @@ class Intent extends Action
         ];
         $failUrl = $this->urlBuilder->getUrl(ConfigData::FINANCING_FAIL_URL);
         $successUrl = $this->urlBuilder->getUrl(
-                ConfigData::FINANCING_SUCCESS_URL,
-                ['_query' => ['order_id' => $order->getId(), 'store_code' => $order->getStore()->getCode()]]
-            );
+            ConfigData::FINANCING_SUCCESS_URL,
+            ['_query' => ['order_id' => $order->getId(), 'store_code' => $order->getStore()->getCode()]]
+        );
         $intentParams = [
             'pos_client_id' => $this->getRequest()->getParam('pos_client_id'),
             'order_id' => $order->getId(),

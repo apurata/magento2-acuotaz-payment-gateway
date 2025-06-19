@@ -33,17 +33,17 @@ class Success extends Action
     public function execute()
     {
         return $this->errorHandler->neverRaise(function () {
-        $orderId = $this->getRequest()->getParam('order_id');
-        if ($orderId) {
-            $order = $this->orderRepository->get($orderId);
-            if ($order && $order->getId()) {
-                $this->checkoutSession->setLastOrderId($order->getId());
-                $this->checkoutSession->setLastRealOrderId($order->getIncrementId());
-                $this->checkoutSession->setLastSuccessQuoteId($order->getQuoteId());
-                $this->checkoutSession->setLastQuoteId($order->getQuoteId());
+            $orderId = $this->getRequest()->getParam('order_id');
+            if ($orderId) {
+                $order = $this->orderRepository->get($orderId);
+                if ($order && $order->getId()) {
+                    $this->checkoutSession->setLastOrderId($order->getId());
+                    $this->checkoutSession->setLastRealOrderId($order->getIncrementId());
+                    $this->checkoutSession->setLastSuccessQuoteId($order->getQuoteId());
+                    $this->checkoutSession->setLastQuoteId($order->getQuoteId());
+                }
             }
-        }
             return $this->resultRedirectFactory->create()->setPath('checkout/onepage/success');
-        });
+        }, 'Success');
     }
 }

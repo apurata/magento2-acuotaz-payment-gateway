@@ -15,8 +15,7 @@ class Context implements ObserverInterface
         private ProductMetadataInterface $productMetadata,
         private ModuleListInterface $moduleList,
         private ErrorHandler $errorHandler
-    ) {
-    }
+    ) {}
     /**
      * @param \Magento\Framework\Event\Observer $observer
      */
@@ -32,6 +31,6 @@ class Context implements ObserverInterface
                 "magento_version"    => $magento_version,
                 "mg_acuotaz_version" => $plugin_version,
             ], true);
-        }, '');
+        }, 'SendContext');
     }
 }

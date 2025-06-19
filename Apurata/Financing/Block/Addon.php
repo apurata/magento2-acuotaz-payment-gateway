@@ -58,7 +58,7 @@ class Addon extends \Magento\Framework\View\Element\Template
             'user__last_name' => $current_user ? $current_user->getLastname() : null,
             'user__session_id' => $this->getSessionId(),
         ];
-        return array_filter($urlParams, fn ($value) => $value !== null);
+        return array_filter($urlParams, fn($value) => $value !== null);
     }
 
     private function getApurataAddonInsecure($page)
@@ -79,7 +79,7 @@ class Addon extends \Magento\Framework\View\Element\Template
     {
         return $this->errorHandler->neverRaise(function () use ($page) {
             return $this->getApurataAddonInsecure($page);
-        }, '');
+        }, 'getApurataAddon', '');
     }
 
     public function getApurataPixel()

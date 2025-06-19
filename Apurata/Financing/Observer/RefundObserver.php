@@ -45,6 +45,6 @@ class RefundObserver implements ObserverInterface
 
     public function execute(Observer $observer)
     {
-        return $this->errorHandler->neverRaise(fn() => $this->makeRefundInsecure($observer), '');
+        return $this->errorHandler->neverRaise(fn() => $this->makeRefundInsecure($observer), 'RefundObserver');
     }
 }

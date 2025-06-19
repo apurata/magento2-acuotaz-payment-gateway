@@ -47,7 +47,7 @@ class HandleEvent extends Action
                 $this->addStatusHistoryComment($order, $comment);
             }
             return $response;
-        });
+        }, 'HandleEvent');
     }
 
     private function loadOrder($orderId, $response)
