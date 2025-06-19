@@ -33,7 +33,7 @@ class Intent extends Action
         $this->checkoutSession->restoreQuote();
         $apiResult = $this->requestBuilder->makeCurlToApurata('POST', ConfigData::APURATA_CREATE_ORDER_URL, $intentParams);
         if ($apiResult['http_code'] == 200) {
-            $this->_redirect($apiResult['response_json']['redirect_to']);
+            $this->_redirect($apiResult['response_json']->redirect_to);
         } else {
             error_log(sprintf('Apurata log: Error al crear orden http_code %s', $apiResult['http_code']));
             $objectManager = ObjectManager::getInstance();
