@@ -6,12 +6,14 @@ use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Message\ManagerInterface;
 use Apurata\Financing\Helper\RequestBuilder;
+use Apurata\Financing\Helper\ErrorHandler;
 
 class RefundObserver implements ObserverInterface
 {
     public function __construct(
         private RequestBuilder $requestBuilder,
         private ManagerInterface $messageManager,
+        private ErrorHandler $errorHandler
     ) {}
 
     private function makeRefundInsecure($observer)
@@ -37,24 +39,12 @@ class RefundObserver implements ObserverInterface
         }
         $apiResult = $this->requestBuilder->makeCurlToApurata("POST", $url, $data, false, $extra_headers);
         if ($apiResult['http_code'] != 200) {
-            throw new \Exception('Error: ' . $respCode . ' - Refund request failed for order ID ' . $orderId);
+            throw new \Exception('Error: ' . $apiResult['http_code'] . ' - Refund request failed for order ID ' . $orderId);
         }
     }
 
     public function execute(Observer $observer)
     {
-        try {
-            return $this->makeRefundInsecure($observer);
-        } catch (\Throwable $e) {
-            $this->requestBuilder->sendToSentry('Error al procesar el reembolso', $e);
-            $this->messageManager->addErrorMessage(__('Error al procesar el reembolso. Por favor enviar correo manual a aCuotaz.'));
-            error_log(sprintf(
-                "Apurata log: %s in file : %s line: %s",
-                $e->getMessage(),
-                $e->getFile(),
-                $e->getLine()
-            ));
-        }
-        return '';
+        return $this->errorHandler->neverRaise(fn() => $this->makeRefundInsecure($observer), '');
     }
 }

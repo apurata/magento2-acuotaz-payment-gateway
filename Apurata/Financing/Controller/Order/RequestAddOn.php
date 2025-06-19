@@ -9,6 +9,7 @@ use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Apurata\Financing\Model\Financing;
+use Apurata\Financing\Helper\ErrorHandler;
 
 class RequestAddOn extends Action
 {
@@ -17,13 +18,15 @@ class RequestAddOn extends Action
         private RequestBuilder $requestBuilder,
         private Session $session,
         private JsonFactory $resultJsonFactory,
-        private Financing $financing
+        private Financing $financing,
+        private ErrorHandler $errorHandler
     ) {
         return parent::__construct($context);
     }
 
     public function execute()
     {
+        return $this->errorHandler->neverRaise(function () {
         $resultJson = $this->resultJsonFactory->create();
         if (!$this->financing->isAvailable()) {
             return $resultJson->setData(['addon' => '']);
@@ -46,5 +49,6 @@ class RequestAddOn extends Action
             $addon = '';
         }
         return $resultJson->setData(['addon' => $addon]);
+        }, '');
     }
 }

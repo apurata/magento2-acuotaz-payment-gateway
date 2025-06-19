@@ -6,6 +6,7 @@ use Apurata\Financing\Helper\ConfigData;
 use Apurata\Financing\Helper\RequestBuilder;
 use Apurata\Financing\Model\Financing;
 use Exception;
+use Apurata\Financing\Helper\ErrorHandler;
 
 class Addon extends \Magento\Framework\View\Element\Template
 {
@@ -19,6 +20,7 @@ class Addon extends \Magento\Framework\View\Element\Template
         private \Magento\Framework\Registry $registry,
         private RequestBuilder $requestBuilder,
         private Financing $financing,
+        private ErrorHandler $errorHandler,
         private array $data = []
     ) {
         parent::__construct($context, $data);
@@ -75,17 +77,9 @@ class Addon extends \Magento\Framework\View\Element\Template
     }
     public function getApurataAddon($page)
     {
-        try {
+        return $this->errorHandler->neverRaise(function () use ($page) {
             return $this->getApurataAddonInsecure($page);
-        } catch (\Throwable $e) {
-            error_log(sprintf(
-                "Apurata log: %s in file : %s line: %s",
-                $e->getMessage(),
-                $e->getFile(),
-                $e->getLine()
-            ));
-        }
-        return '';
+        }, '');
     }
 
     public function getApurataPixel()

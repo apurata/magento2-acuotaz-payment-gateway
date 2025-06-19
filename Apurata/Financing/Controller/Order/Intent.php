@@ -10,7 +10,7 @@ use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\UrlInterface;
 use Psr\Log\LoggerInterface;
-
+use Apurata\Financing\Helper\ErrorHandler;
 
 class Intent extends Action
 {
@@ -20,27 +20,30 @@ class Intent extends Action
         private CheckoutSession $checkoutSession,
         private UrlInterface $urlBuilder,
         private RequestBuilder $requestBuilder,
-        private \Magento\Customer\Model\Session $customerSession2
+        private \Magento\Customer\Model\Session $customerSession2,
+        private ErrorHandler $errorHandler
     ) {
         return parent::__construct($context);
     }
 
     public function execute()
     {
-        $order = $this->checkoutSession->getLastRealOrder();
-        $this->handleApurataId();
-        $intentParams = $this->buildIntentParams($order);
-        $this->checkoutSession->restoreQuote();
-        $apiResult = $this->requestBuilder->makeCurlToApurata('POST', ConfigData::APURATA_CREATE_ORDER_URL, $intentParams);
-        if ($apiResult['http_code'] == 200) {
-            $this->_redirect($apiResult['response_json']->redirect_to);
-        } else {
-            error_log(sprintf('Apurata log: Error al crear orden http_code %s', $apiResult['http_code']));
-            $objectManager = ObjectManager::getInstance();
-            $messageManager = $objectManager->get('Magento\Framework\Message\ManagerInterface');
-            $messageManager->addErrorMessage('Hubo un error al procesar el pago con aCuotaz. Por favor, inténtelo de nuevo más tarde.');
-            $this->_redirect($this->urlBuilder->getUrl('checkout'));
-        }
+        return $this->errorHandler->neverRaise(function () {
+            $order = $this->checkoutSession->getLastRealOrder();
+            $this->handleApurataId();
+            $intentParams = $this->buildIntentParams($order);
+            $this->checkoutSession->restoreQuote();
+            $apiResult = $this->requestBuilder->makeCurlToApurata('POST', ConfigData::APURATA_CREATE_ORDER_URL, $intentParams);
+            if ($apiResult['http_code'] == 200) {
+                $this->_redirect($apiResult['response_json']->redirect_to);
+            } else {
+                error_log(sprintf('Apurata log: Error al crear orden http_code %s', $apiResult['http_code']));
+                $objectManager = ObjectManager::getInstance();
+                $messageManager = $objectManager->get('Magento\Framework\Message\ManagerInterface');
+                $messageManager->addErrorMessage('Hubo un error al procesar el pago con aCuotaz. Por favor, inténtelo de nuevo más tarde.');
+                $this->_redirect($this->urlBuilder->getUrl('checkout'));
+            }
+        });
     }
 
     private function handleApurataId()
@@ -91,12 +94,14 @@ class Intent extends Action
         return $intentParams;
     }
 
-    private function getDniFieldId($order)
+    private function getDniFieldId($order): string
     {
-        $dni = $order->getBillingAddress()->getData('dni') ??
-            $order->getBillingAddress()->getData('DNI') ??
-            $order->getBillingAddress()->getData('Dni') ??
-            '';
-        return $dni;
+        $billingAddress = $order->getBillingAddress();
+        foreach ($billingAddress->getData() as $key => $value) {
+            if (strtolower($key) === 'dni' && !empty($value)) {
+                return $value;
+            }
+        }
+        return '';
     }
 }

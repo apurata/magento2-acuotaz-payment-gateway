@@ -12,6 +12,7 @@ use Magento\Checkout\Model\Cart;
 use Magento\Sales\Api\OrderManagementInterface;
 use Magento\Store\Model\ScopeInterface;
 use Apurata\Financing\Helper\ConfigData;
+use Apurata\Financing\Helper\ErrorHandler;
 
 
 class HandleEvent extends Action
@@ -21,29 +22,32 @@ class HandleEvent extends Action
         private Cart $cart,
         private ScopeConfigInterface $scopeConfig,
         private Order $order,
-        private OrderManagementInterface $orderManagement
+        private OrderManagementInterface $orderManagement,
+        private ErrorHandler $errorHandler
     ) {
         return parent::__construct($context);
     }
 
     public function execute()
     {
-        $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
-        $event = $this->getRequest()->getParam('event');
-        $orderId = $this->getRequest()->getParam('order_id');
-        $order = $this->loadOrder($orderId, $response);
-        if (!$order) {
+        return $this->errorHandler->neverRaise(function () {
+            $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
+            $event = $this->getRequest()->getParam('event');
+            $orderId = $this->getRequest()->getParam('order_id');
+            $order = $this->loadOrder($orderId, $response);
+            if (!$order) {
+                return $response;
+            }
+            $auth = $this->checkAuthorization($response);
+            if (!$auth) {
+                return $response;
+            }
+            $comment = $this->processEvent($order, $event, $response);
+            if ($comment) {
+                $this->addStatusHistoryComment($order, $comment);
+            }
             return $response;
-        }
-        $auth = $this->checkAuthorization($response);
-        if (!$auth) {
-            return $response;
-        }
-        $comment = $this->processEvent($order, $event, $response);
-        if ($comment) {
-            $this->addStatusHistoryComment($order, $comment);
-        }
-        return $response;
+        });
     }
 
     private function loadOrder($orderId, $response)
