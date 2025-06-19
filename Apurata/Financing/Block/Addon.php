@@ -69,8 +69,8 @@ class Addon extends \Magento\Framework\View\Element\Template
         $total = ($page == 'product' && $product) ? $product->getFinalPrice() : $cart->getGrandTotal();
         $urlParams = $this->getUrlParams($page, $cart, $product);
         $url = ConfigData::APURATA_ADD_ON . urlencode($total) . '?' . http_build_query(array_map('urlencode', $urlParams));
-        list($respCode, $payWithApurataAddon) = $this->requestBuilder->makeCurlToApurata("GET", $url);
-        $addon = ($respCode == 200) ? str_replace(array("\r", "\n"), '', $payWithApurataAddon) : '';
+        $apiResult = $this->requestBuilder->makeCurlToApurata("GET", $url);
+        $addon = ($apiResult['http_code'] == 200) ? str_replace(array("\r", "\n"), '', $apiResult['response_raw']) : '';
         return $addon;
     }
     public function getApurataAddon($page)
@@ -95,12 +95,12 @@ class Addon extends \Magento\Framework\View\Element\Template
         if ($this->apurata_script) {
             return $this->apurata_script;
         }
-        list($respCode, $apurata_script) = $this->requestBuilder->makeCurlToApurata("GET", $url);
-        if ($respCode == 200) {
-            $this->apurata_script = $apurata_script;
+        $apiResult = $this->requestBuilder->makeCurlToApurata("GET", $url);
+        if ($apiResult['http_code'] == 200) {
+            $this->apurata_script = $apiResult['response_raw'];
             return $this->apurata_script;
         } else {
-            error_log(sprintf('Apurata responded with http_code %s', $respCode));
+            error_log(sprintf('Apurata responded with http_code %s', $apiResult['http_code']));
             return '';
         }
     }

@@ -31,12 +31,11 @@ class Intent extends Action
         $this->handleApurataId();
         $intentParams = $this->buildIntentParams($order);
         $this->checkoutSession->restoreQuote();
-        list($respCode, $response) = $this->requestBuilder->makeCurlToApurata('POST', ConfigData::APURATA_CREATE_ORDER_URL, $intentParams);
-        $response = json_decode($response);
-        if ($respCode == 200) {
-            $this->_redirect($response->redirect_to);
+        $apiResult = $this->requestBuilder->makeCurlToApurata('POST', ConfigData::APURATA_CREATE_ORDER_URL, $intentParams);
+        if ($apiResult['http_code'] == 200) {
+            $this->_redirect($apiResult['response_json']['redirect_to']);
         } else {
-            error_log(sprintf('Apurata log: Error al crear orden http_code %s', $respCode));
+            error_log(sprintf('Apurata log: Error al crear orden http_code %s', $apiResult['http_code']));
             $objectManager = ObjectManager::getInstance();
             $messageManager = $objectManager->get('Magento\Framework\Message\ManagerInterface');
             $messageManager->addErrorMessage('Hubo un error al procesar el pago con aCuotaz. Por favor, inténtelo de nuevo más tarde.');
@@ -51,6 +50,7 @@ class Intent extends Action
                 $this->customerSession2->setApurataId($this->customerSession2->getSessionId());
             }
         } catch (\Throwable $e) {
+            $this->requestBuilder->sendToSentry('Cannot get session_id', $e);
             error_log('Apurata log: cannot get session_id');
         }
     }
@@ -74,13 +74,18 @@ class Intent extends Action
             'session_id' => $this->customerSession2->getApurataId(),
             'merchant_reference' => $order->getIncrementId(),
         ];
+        $failUrl = $this->urlBuilder->getUrl(ConfigData::FINANCING_FAIL_URL);
+        $successUrl = $this->urlBuilder->getUrl(
+                ConfigData::FINANCING_SUCCESS_URL,
+                ['_query' => ['order_id' => $order->getId(), 'store_code' => $order->getStore()->getCode()]]
+            );
         $intentParams = [
             'pos_client_id' => $this->getRequest()->getParam('pos_client_id'),
             'order_id' => $order->getId(),
             'amount' => $order->getGrandTotal(),
-            'url_redir_on_canceled' => rtrim($this->urlBuilder->getUrl(ConfigData::FINANCING_FAIL_URL), '/'),
-            'url_redir_on_rejected' => rtrim($this->urlBuilder->getUrl(ConfigData::FINANCING_FAIL_URL), '/'),
-            'url_redir_on_success' => rtrim($this->urlBuilder->getUrl(ConfigData::FINANCING_SUCCESS_URL . '?order_id=' . $order->getId()), '/'),
+            'url_redir_on_canceled' => $failUrl,
+            'url_redir_on_rejected' => $failUrl,
+            'url_redir_on_success' => $successUrl,
             'customer_data' => $customerData,
         ];
         return $intentParams;

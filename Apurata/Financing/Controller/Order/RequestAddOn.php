@@ -39,9 +39,9 @@ class RequestAddOn extends Action
         if ($page == 'cart' && $number_of_items > 1) {
             $url .= '&multiple_products=' . urlencode('TRUE');
         }
-        list($respCode, $payWithApurataAddon) = $this->requestBuilder->makeCurlToApurata("GET", $url);
-        if ($respCode == 200) {
-            $addon = str_replace(array("\r", "\n"), '', $payWithApurataAddon);
+        $apiResult = $this->requestBuilder->makeCurlToApurata("GET", $url);
+        if ($apiResult['http_code'] == 200) {
+            $addon = str_replace(array("\r", "\n"), '', $apiResult['response_raw']);
         } else {
             $addon = '';
         }

@@ -35,8 +35,8 @@ class RefundObserver implements ObserverInterface
             $data['amount'] = $refundAmount;
             $url = "/pos/order/{$orderId}/partial-refund";
         }
-        list($respCode, $response) = $this->requestBuilder->makeCurlToApurata("POST", $url, $data, false, $extra_headers);
-        if ($respCode != 200) {
+        $apiResult = $this->requestBuilder->makeCurlToApurata("POST", $url, $data, false, $extra_headers);
+        if ($apiResult['http_code'] != 200) {
             throw new \Exception('Error: ' . $respCode . ' - Refund request failed for order ID ' . $orderId);
         }
     }
@@ -46,6 +46,7 @@ class RefundObserver implements ObserverInterface
         try {
             return $this->makeRefundInsecure($observer);
         } catch (\Throwable $e) {
+            $this->requestBuilder->sendToSentry('Error al procesar el reembolso', $e);
             $this->messageManager->addErrorMessage(__('Error al procesar el reembolso. Por favor enviar correo manual a aCuotaz.'));
             error_log(sprintf(
                 "Apurata log: %s in file : %s line: %s",
