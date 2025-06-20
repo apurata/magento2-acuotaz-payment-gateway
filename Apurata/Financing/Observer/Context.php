@@ -6,37 +6,31 @@ use Magento\Framework\Event\ObserverInterface;
 use Apurata\Financing\Helper\RequestBuilder;
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\Module\ModuleListInterface;
+use Apurata\Financing\Helper\ErrorHandler;
 
 class Context implements ObserverInterface
 {
     public function __construct(
         private RequestBuilder $requestBuilder,
         private ProductMetadataInterface $productMetadata,
-        private ModuleListInterface $moduleList
-    ) {
-    }
+        private ModuleListInterface $moduleList,
+        private ErrorHandler $errorHandler
+    ) {}
     /**
      * @param \Magento\Framework\Event\Observer $observer
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
-        try {
+        return $this->errorHandler->neverRaise(function () {
             $client_id = $this->requestBuilder->configReader->getClientId();
-            $mangento_version  = $this->productMetadata->getVersion();
+            $magento_version = $this->productMetadata->getVersion();
             $plugin_version = $this->moduleList->getOne('Apurata_Financing')['setup_version'];
             $url = "/pos/client/" . $client_id . "/context";
-            $this->requestBuilder->makeCurlToApurata("POST", $url, array(
-                "php_version"         => phpversion(),
-                "magento_version"   => $mangento_version,
-                "mg_acuotaz_version"  => $plugin_version,
-            ), TRUE);
-        } catch (\Throwable $e) {
-            error_log(sprintf(
-                "%s in file : %s line: %s",
-                $e->getMessage(),
-                $e->getFile(),
-                $e->getLine()
-            ));
-        }
+            $this->requestBuilder->makeCurlToApurata("POST", $url, [
+                "php_version"        => phpversion(),
+                "magento_version"    => $magento_version,
+                "mg_acuotaz_version" => $plugin_version,
+            ], true);
+        }, 'SendContext');
     }
 }

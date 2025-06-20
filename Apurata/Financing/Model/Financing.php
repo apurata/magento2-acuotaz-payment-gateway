@@ -60,9 +60,8 @@ class Financing extends \Magento\Payment\Model\Method\AbstractMethod
     public function getLandingConfig()
     {
         if (!$this->landingConfig) {
-            list($respCode, $landingConfig) = $this->requestBuilder->makeCurlToApurata("GET", ConfigData::APURATA_LANDING_CONFIG);
-            $landingConfig = json_decode($landingConfig);
-            $this->landingConfig = ($respCode == 200) ? $landingConfig : null;
+            $apiResult = $this->requestBuilder->makeCurlToApurata("GET", ConfigData::APURATA_LANDING_CONFIG);
+            $this->landingConfig = ($apiResult['http_code'] == 200) ? $apiResult['response_json'] : null;
         }
         return $this->landingConfig;
     }

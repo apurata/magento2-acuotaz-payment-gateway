@@ -6,6 +6,7 @@ use Apurata\Financing\Helper\ConfigData;
 use Apurata\Financing\Helper\RequestBuilder;
 use Apurata\Financing\Model\Financing;
 use Exception;
+use Apurata\Financing\Helper\ErrorHandler;
 
 class Addon extends \Magento\Framework\View\Element\Template
 {
@@ -19,6 +20,7 @@ class Addon extends \Magento\Framework\View\Element\Template
         private \Magento\Framework\Registry $registry,
         private RequestBuilder $requestBuilder,
         private Financing $financing,
+        private ErrorHandler $errorHandler,
         private array $data = []
     ) {
         parent::__construct($context, $data);
@@ -56,7 +58,7 @@ class Addon extends \Magento\Framework\View\Element\Template
             'user__last_name' => $current_user ? $current_user->getLastname() : null,
             'user__session_id' => $this->getSessionId(),
         ];
-        return array_filter($urlParams, fn ($value) => $value !== null);
+        return array_filter($urlParams, fn($value) => $value !== null);
     }
 
     private function getApurataAddonInsecure($page)
@@ -69,23 +71,15 @@ class Addon extends \Magento\Framework\View\Element\Template
         $total = ($page == 'product' && $product) ? $product->getFinalPrice() : $cart->getGrandTotal();
         $urlParams = $this->getUrlParams($page, $cart, $product);
         $url = ConfigData::APURATA_ADD_ON . urlencode($total) . '?' . http_build_query(array_map('urlencode', $urlParams));
-        list($respCode, $payWithApurataAddon) = $this->requestBuilder->makeCurlToApurata("GET", $url);
-        $addon = ($respCode == 200) ? str_replace(array("\r", "\n"), '', $payWithApurataAddon) : '';
+        $apiResult = $this->requestBuilder->makeCurlToApurata("GET", $url);
+        $addon = ($apiResult['http_code'] == 200) ? str_replace(array("\r", "\n"), '', $apiResult['response_raw']) : '';
         return $addon;
     }
     public function getApurataAddon($page)
     {
-        try {
+        return $this->errorHandler->neverRaise(function () use ($page) {
             return $this->getApurataAddonInsecure($page);
-        } catch (\Throwable $e) {
-            error_log(sprintf(
-                "Apurata log: %s in file : %s line: %s",
-                $e->getMessage(),
-                $e->getFile(),
-                $e->getLine()
-            ));
-        }
-        return '';
+        }, 'getApurataAddon', '');
     }
 
     public function getApurataPixel()
@@ -95,12 +89,12 @@ class Addon extends \Magento\Framework\View\Element\Template
         if ($this->apurata_script) {
             return $this->apurata_script;
         }
-        list($respCode, $apurata_script) = $this->requestBuilder->makeCurlToApurata("GET", $url);
-        if ($respCode == 200) {
-            $this->apurata_script = $apurata_script;
+        $apiResult = $this->requestBuilder->makeCurlToApurata("GET", $url);
+        if ($apiResult['http_code'] == 200) {
+            $this->apurata_script = $apiResult['response_raw'];
             return $this->apurata_script;
         } else {
-            error_log(sprintf('Apurata responded with http_code %s', $respCode));
+            error_log(sprintf('Apurata responded with http_code %s', $apiResult['http_code']));
             return '';
         }
     }
