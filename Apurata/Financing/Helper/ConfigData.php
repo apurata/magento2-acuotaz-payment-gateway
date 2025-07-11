@@ -8,6 +8,7 @@ class ConfigData
     const SECRET_TOKEN_CONFIG_PATH = 'payment/apurata_financing/secret_token';
     const KEY_APURATA_CLIENT_ID = 'apurata_client_id';
     const KEY_ACTIVE = 'active';
+    const GENERATE_INVOICE_CONFIG_PATH = 'payment/apurata_financing/generate_invoice';
 
     const APURATA_DOMAIN = 'https://apurata.com';
     const APURATA_STATIC_DOMAIN = 'https://static.apurata.com';
