@@ -10,7 +10,7 @@ use Magento\Framework\Module\ModuleListInterface;
 class RequestBuilder
 {
         public function __construct(
-            private ConfigReader $configReader,
+            public ConfigReader $configReader,
             private ProductMetadataInterface $productMetadata,
             private ModuleListInterface $moduleList,
             private ErrorHandler $errorHandler

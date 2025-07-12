@@ -144,16 +144,13 @@ class HandleEvent extends Action
             $invoice->setRequestedCaptureCase(\Magento\Sales\Model\Order\Invoice::CAPTURE_OFFLINE);
             $invoice->register();
             $invoice->pay();
-            $transactionSave = $this->transaction
-            ->addObject($invoice)
-            ->addObject($invoice->getOrder());
+            $transactionSave = $this->transaction->addObject($invoice)->addObject($invoice->getOrder());
             $transactionSave->save();
             $this->invoiceSender->send($invoice);
-
             $comment = 'aCuotaz notifica que esta orden fue pagada, la factura se generó y ya se puede entregar';
         }
         else {
-            $comment = 'aCuotaz notifica que esta orden fue pagada, pero no se generó la factura (generar la factura manualmente)';
+            $comment = 'aCuotaz notifica que esta orden fue pagada, y ya se puede entregar (generar la factura manualmente)';
         }
         return $comment;
     }

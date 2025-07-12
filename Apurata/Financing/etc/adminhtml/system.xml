@@ -28,16 +28,17 @@
                         <field id="active">1</field>
                     </depends>
                 </field>
-                <field id="sentry_dsn" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Apurata Sentry DSN</label>
-                    <comment>Habilitar monitoreo de errores para mejorar el soporte y estabilidad</comment>
+                <field id="generate_invoice" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Generate invoice automatically</label>
+                    <comment>If enabled, the invoice will be generated automatically after aCuotaz confirms the payment. Default: disabled.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <depends>
                         <field id="active">1</field>
                     </depends>
                 </field>
-                <field id="generate_invoice" translate="label" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Generate invoice automatically</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                <field id="sentry_dsn" translate="label" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Apurata Sentry DSN</label>
+                    <comment>Habilitar monitoreo de errores para mejorar el soporte y estabilidad</comment>
                     <depends>
                         <field id="active">1</field>
                     </depends>
