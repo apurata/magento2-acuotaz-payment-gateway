@@ -3,16 +3,12 @@
 ## Installation
 - Get the plugin
 
-   Option 1: Using composer, execute in Magento directory (recommended):
+   Using composer, execute in Magento directory:
    
    ```
     composer require apurata/financing:"0.4.*"
    ```
-   
-   Option 2: Direct Download, place the zip in (Magento dir)/app/code/:
 
-   [Link de descarga](https://github.com/apurata/magento2-acuotaz-payment-gateway/releases/download/0.4.4/magento2-acuotaz-payment-gateway-0.4.4.zip)
-  
 - Upgrade and compile page, to add apurata plugin:
 
    ```
@@ -56,7 +52,8 @@ composer update apurata/financing
 1. On the Admin sidebar, click Stores > Settings > Configuration.
 2. In the panel on the left, choose Sales > Payment Methods > Apurata Financing.
 3. Enter Apurata client ID and Secret token.
-4. Save configuration.
+4. Select the 'Generate invoice automatically' option if you want invoices to be generated automatically. This option is disabled by default.
+5. Save configuration.
 
 ## aCuotaz order state
 
