@@ -13,6 +13,9 @@ use Magento\Sales\Api\OrderManagementInterface;
 use Magento\Store\Model\ScopeInterface;
 use Apurata\Financing\Helper\ConfigData;
 use Apurata\Financing\Helper\ErrorHandler;
+use Magento\Sales\Model\Service\InvoiceService;
+use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
+use Magento\Framework\DB\Transaction;
 
 
 class HandleEvent extends Action
@@ -23,7 +26,10 @@ class HandleEvent extends Action
         private ScopeConfigInterface $scopeConfig,
         private Order $order,
         private OrderManagementInterface $orderManagement,
-        private ErrorHandler $errorHandler
+        private ErrorHandler $errorHandler,
+        private InvoiceService $invoiceService,
+        private InvoiceSender $invoiceSender,
+        private Transaction $transaction
     ) {
         return parent::__construct($context);
     }
@@ -131,8 +137,21 @@ class HandleEvent extends Action
             return null;
         }
         $response->setData(['message' => __('Order successfully funded')]);
-        $comment = 'aCuotaz notifica que esta orden fue pagada y ya se puede entregar';
         $order->setState('processing')->setStatus('processing');
+        $generateInvoice = $this->scopeConfig->getValue(ConfigData::GENERATE_INVOICE_CONFIG_PATH, ScopeInterface::SCOPE_STORE);
+        if ($generateInvoice == '1') {
+            $invoice = $this->invoiceService->prepareInvoice($order);
+            $invoice->setRequestedCaptureCase(\Magento\Sales\Model\Order\Invoice::CAPTURE_OFFLINE);
+            $invoice->register();
+            $invoice->pay();
+            $transactionSave = $this->transaction->addObject($invoice)->addObject($invoice->getOrder());
+            $transactionSave->save();
+            $this->invoiceSender->send($invoice);
+            $comment = 'aCuotaz notifica que esta orden fue pagada, la factura se generó y ya se puede entregar';
+        }
+        else {
+            $comment = 'aCuotaz notifica que esta orden fue pagada, y ya se puede entregar (generar la factura manualmente)';
+        }
         return $comment;
     }
 

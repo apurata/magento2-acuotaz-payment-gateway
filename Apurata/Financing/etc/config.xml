@@ -6,6 +6,7 @@
                 <title>Cuotas sin tarjeta de crédito - aCuotaz</title>
                 <active>0</active>
                 <order_status>pending</order_status>
+                <generate_invoice>0</generate_invoice>
             </apurata_financing>
         </payment>
     </default>
