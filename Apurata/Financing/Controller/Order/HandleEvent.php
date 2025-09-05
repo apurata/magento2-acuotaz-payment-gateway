@@ -71,18 +71,21 @@ class HandleEvent extends Action
     {
         $auth = $this->getRequest()->getHeader('Apurata-Auth');
         if (!$auth) {
+            $auth = $this->getRequest()->getHeader('Authorization');
+        }
+        if (!$auth) {
             $response->setHttpResponseCode(Exception::HTTP_BAD_REQUEST);
-            $response->setData(['message' => __('Not authorizedasda')]);
+            $response->setData(['message' => __('Not authorized')]);
             return false;
         }
-        list($auth_type, $token) = explode(' ', $auth);
-        if (strtolower($auth_type) != 'bearer') {
+        $auth_parts = explode(' ', $auth);
+        if (count($auth_parts) !== 2 || strtolower($auth_parts[0]) != 'bearer') {
             $response->setHttpResponseCode(Exception::HTTP_BAD_REQUEST);
             $response->setData(['message' => __('Invalid authorization type')]);
             return false;
         }
         $secret_token = $this->scopeConfig->getValue(ConfigData::SECRET_TOKEN_CONFIG_PATH, ScopeInterface::SCOPE_STORE);
-        if ($token != $secret_token) {
+        if ($auth_parts[1] != $secret_token) {
             $response->setHttpResponseCode(Exception::HTTP_BAD_REQUEST);
             $response->setData(['message' => __('Invalid authorization token')]);
             return false;
@@ -148,8 +151,7 @@ class HandleEvent extends Action
             $transactionSave->save();
             $this->invoiceSender->send($invoice);
             $comment = 'aCuotaz notifica que esta orden fue pagada, la factura se generó y ya se puede entregar';
-        }
-        else {
+        } else {
             $comment = 'aCuotaz notifica que esta orden fue pagada, y ya se puede entregar (generar la factura manualmente)';
         }
         return $comment;
