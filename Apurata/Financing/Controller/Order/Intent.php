@@ -96,11 +96,15 @@ class Intent extends Action
 
     private function getDniFieldId($order): string
     {
-        $billingAddress = $order->getBillingAddress();
-        foreach ($billingAddress->getData() as $key => $value) {
-            if (strtolower($key) === 'dni' && !empty($value)) {
-                return $value;
-            }
+        // Check billing address data
+        $billingData = $order->getBillingAddress()->getData();
+        if (isset($billingData['dni']) && !empty($billingData['dni'])) {
+            return $billingData['dni'];
+        }
+        // Check document in custom attributes
+        $document = $order->getBillingAddress()->getCustomAttribute('document');
+        if ($document && !empty($document->getValue())) {
+            return $document->getValue();
         }
         return '';
     }
