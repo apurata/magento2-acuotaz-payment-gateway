@@ -72,7 +72,7 @@ class HandleEvent extends Action
         $auth = $this->getRequest()->getHeader('Apurata-Auth');
         if (!$auth) {
             $response->setHttpResponseCode(Exception::HTTP_BAD_REQUEST);
-            $response->setData(['message' => __('Not authorizedasda')]);
+            $response->setData(['message' => __('Without Apurata header')]);
             return false;
         }
         list($auth_type, $token) = explode(' ', $auth);
@@ -148,8 +148,7 @@ class HandleEvent extends Action
             $transactionSave->save();
             $this->invoiceSender->send($invoice);
             $comment = 'aCuotaz notifica que esta orden fue pagada, la factura se generó y ya se puede entregar';
-        }
-        else {
+        } else {
             $comment = 'aCuotaz notifica que esta orden fue pagada, y ya se puede entregar (generar la factura manualmente)';
         }
         return $comment;
