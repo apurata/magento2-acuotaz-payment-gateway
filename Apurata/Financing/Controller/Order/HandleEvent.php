@@ -71,21 +71,18 @@ class HandleEvent extends Action
     {
         $auth = $this->getRequest()->getHeader('Apurata-Auth');
         if (!$auth) {
-            $auth = $this->getRequest()->getHeader('Authorization');
-        }
-        if (!$auth) {
             $response->setHttpResponseCode(Exception::HTTP_BAD_REQUEST);
-            $response->setData(['message' => __('Not authorized')]);
+            $response->setData(['message' => __('Without Apurata header')]);
             return false;
         }
-        $auth_parts = explode(' ', $auth);
-        if (count($auth_parts) !== 2 || strtolower($auth_parts[0]) != 'bearer') {
+        list($auth_type, $token) = explode(' ', $auth);
+        if (strtolower($auth_type) != 'bearer') {
             $response->setHttpResponseCode(Exception::HTTP_BAD_REQUEST);
             $response->setData(['message' => __('Invalid authorization type')]);
             return false;
         }
         $secret_token = $this->scopeConfig->getValue(ConfigData::SECRET_TOKEN_CONFIG_PATH, ScopeInterface::SCOPE_STORE);
-        if ($auth_parts[1] != $secret_token) {
+        if ($token != $secret_token) {
             $response->setHttpResponseCode(Exception::HTTP_BAD_REQUEST);
             $response->setData(['message' => __('Invalid authorization token')]);
             return false;
