@@ -12,8 +12,13 @@
     </div>
     <div class="payment-method-content">
         <!--The next div will display any important information before redirect people to Apurata POS landing-->
-        <div data-bind="" afterRender="initApurataFinancing" id="apurata-pos-steps"></div>
+        <div data-bind="afterRender: initApurataFinancing" id="apurata-pos-steps"></div>
         <br>
+        <div class="checkout-agreements-block">
+            <!-- ko foreach: $parent.getRegion('before-place-order') -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!-- /ko -->
+        </div>
         <div class="actions-toolbar">
             <div class="primary">
                 <button class="action primary checkout"
