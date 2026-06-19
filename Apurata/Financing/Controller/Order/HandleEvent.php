@@ -69,7 +69,9 @@ class HandleEvent extends Action
 
     private function checkAuthorization($response)
     {
-        $auth = $this->getRequest()->getHeader('Apurata-Auth');
+        $auth = $this->getRequest()->getHeader('Apurata-Auth')
+            ?: $this->getRequest()->getHeader('apurata-auth')
+            ?: ($_SERVER['HTTP_APURATA_AUTH'] ?? '');
         if (!$auth) {
             $response->setHttpResponseCode(Exception::HTTP_BAD_REQUEST);
             $response->setData(['message' => __('Without Apurata header')]);
