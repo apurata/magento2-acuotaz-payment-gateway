@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<csp_whitelist xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Csp/etc/csp_whitelist.xsd">
+    <!--
+      Magento 2.4.7+ enforces CSP restrict mode on checkout/payment pages
+      (earlier versions were mostly report-only, so external images still loaded).
+      The payment method title template loads the aCuotaz logo from
+      https://static.apurata.com/... — without this whitelist the browser blocks
+      the image and only shows the img alt text ("aCuotaz").
+      Docs: https://developer.adobe.com/commerce/php/development/security/content-security-policies
+    -->
+    <policies>
+        <policy id="img-src">
+            <values>
+                <value id="apurata_static" type="host">static.apurata.com</value>
+            </values>
+        </policy>
+    </policies>
+</csp_whitelist>
