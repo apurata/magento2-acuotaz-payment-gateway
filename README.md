@@ -1,10 +1,23 @@
 # magento2 acuotaz payment gateway
 
+Payment module for **aCuotaz** (Apurata BNPL) on Magento 2 / Adobe Commerce.
+
+Install via Composer: `apurata/financing` (`composer require apurata/financing:"0.4.*"`).
+
+## Requirements
+
+- **Magento Open Source** or **Adobe Commerce** 2.4.x
+- PHP version supported by your Magento release (2.4.8 requires PHP 8.2–8.4)
+- Store currency **PEN**, checkout over **HTTPS**
+
+Last validated on **Magento 2.4.8** (Adobe Commerce / Open Source). Older 2.4.x releases are supported; use the latest plugin version from Packagist.
+
 ## Installation
+
 - Get the plugin
 
    Using composer, execute in Magento directory:
-   
+
    ```
     composer require apurata/financing:"0.4.*"
    ```
@@ -47,6 +60,7 @@
 ```
 composer update apurata/financing
 ```
+
 ## Configuration
 
 1. On the Admin sidebar, click Stores > Settings > Configuration.
@@ -62,7 +76,7 @@ We just use three events to change the order status  in the ecommerce:
    - funded: Disbursement made. Change order status to "processing".
    - rejected: Credit assessment denied user. Change order status to "canceled".
    - canceled: Application canceled. Change order status to "canceled".
-  
+
 For the rest of the events we add notes in each order, in the "Comments history" section.
 
-
+There is no Magento status literally named “Paid”; aCuotaz “pagada” ≈ **Processing** after `event=funded`.

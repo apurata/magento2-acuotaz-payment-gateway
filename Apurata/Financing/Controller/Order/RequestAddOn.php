@@ -32,11 +32,14 @@ class RequestAddOn extends Action
                 return $resultJson->setData(['addon' => '']);
             }
             $cart = $this->session->getQuote();
-            $page = $this->getRequest()->getParam('page');
+            $page = $this->getRequest()->getParam('page') ?: '';
             $total = $this->getRequest()->getParam('total');
             if (!$total) {
                 $total = $cart->getGrandTotal();
             }
+            // PHP 8.4: urlencode(null) is deprecated; Magento turns that into an error
+            // and neverRaise returns empty body → checkout add-on never renders.
+            $total = (string) ($total ?? '0');
             $number_of_items = $cart->getItemsQty();
             $url = ConfigData::APURATA_ADD_ON . urlencode($total) . '?page=' . $page;
             if ($page == 'cart' && $number_of_items > 1) {

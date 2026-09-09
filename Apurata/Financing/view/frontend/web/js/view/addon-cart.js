@@ -29,7 +29,10 @@ define(
                 var totals = cart_data().totals;
                 if (totals && totals.grand_total != cart_total) {
                     total = "&total=" + totals.grand_total;
-                    id = "#acuotaz-add-on-cart"
+                    // Cart page uses #acuotaz-add-on-cart; checkout sidebar uses .acuotaz-add-on-minicart
+                    if ($('#acuotaz-add-on-cart').length) {
+                        id = "#acuotaz-add-on-cart";
+                    }
                     requestaddon();
                 }
             });

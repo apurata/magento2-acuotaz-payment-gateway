@@ -41,12 +41,23 @@ define(
                 this.financingCreationUrl = config.financingCreationUrl;
                 this.apurataClientId = config.apurataClientId;
 
+                // Same-origin Magento proxy (avoids CSP connect-src + mixed content)
+                var infoStepsUrl = config.financingInfoStepsUrl;
+                if (!infoStepsUrl) {
+                    return;
+                }
                 var r = new XMLHttpRequest();
-                r.open("GET", "https://apurata.com/pos/" + this.apurataClientId + "/info-steps", true);
+                r.open('GET', infoStepsUrl, true);
                 r.onreadystatechange = function () {
-                if (r.readyState != 4 || r.status != 200) return;
-                var elem = document.getElementById("apurata-pos-steps");
-                elem.innerHTML = r.responseText;
+                    if (r.readyState != 4 || r.status != 200) return;
+                    var elem = document.getElementById('apurata-pos-steps');
+                    if (!elem) return;
+                    try {
+                        var data = JSON.parse(r.responseText);
+                        elem.innerHTML = data.info_steps || '';
+                    } catch (e) {
+                        elem.innerHTML = r.responseText;
+                    }
                 };
                 r.send();
             },
