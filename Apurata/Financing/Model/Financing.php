@@ -66,7 +66,8 @@ class Financing extends \Magento\Payment\Model\Method\AbstractMethod
         return $this->landingConfig;
     }
 
-    public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
+    // PHP 8.4 (Magento 2.4.8): nullable must be explicit (?Type), else di:compile fails
+    public function isAvailable(?\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
         if (!$this->config_reader->allowHttp() && $_SERVER['REQUEST_SCHEME'] != 'https') {
             error_log('Apurata solo soporta https');

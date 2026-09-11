@@ -19,6 +19,7 @@ class ConfigData
 
     const FINANCING_INTENT_PATH = 'apuratafinancing/order/intent';
     const FINANCING_ADD_ON_PATH = 'apuratafinancing/order/requestaddon';
+    const FINANCING_INFO_STEPS_PATH = 'apuratafinancing/order/infosteps';
     const FINANCING_FAIL_URL = 'apuratafinancing/order/cancelation';
     const FINANCING_SUCCESS_URL = 'apuratafinancing/order/success';
     const ALLOW_HTTP = True;

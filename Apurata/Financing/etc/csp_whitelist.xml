@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<csp_whitelist xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Csp/etc/csp_whitelist.xsd">
+    <!--
+      Magento 2.4.7+ enforces CSP restrict mode on checkout/payment pages
+      (earlier versions were mostly report-only, so external images still loaded).
+
+      Payment method logo + payment mocker (add-on banner) load assets from
+      https://static.apurata.com/... — without img-src whitelist the browser blocks
+      those images and may only show alt text.
+
+      The mocker HTML also @imports Google Fonts (Poppins); without style-src /
+      font-src those fonts fail under CSP restrict.
+
+      Checkout info-steps (green box under the payment radio) is proxied via
+      Magento apuratafinancing/order/infosteps (same-origin), then Magento curls
+      Apurata server-side — same pattern as requestaddon. That avoids CSP
+      connect-src blocks and HTTPS page → HTTP Apurata mixed content.
+
+      Docs: https://developer.adobe.com/commerce/php/development/security/content-security-policies
+    -->
+    <policies>
+        <policy id="img-src">
+            <values>
+                <value id="apurata_static" type="host">static.apurata.com</value>
+            </values>
+        </policy>
+        <policy id="style-src">
+            <values>
+                <value id="google_fonts_css" type="host">fonts.googleapis.com</value>
+            </values>
+        </policy>
+        <policy id="font-src">
+            <values>
+                <value id="google_fonts_files" type="host">fonts.gstatic.com</value>
+            </values>
+        </policy>
+    </policies>
+</csp_whitelist>

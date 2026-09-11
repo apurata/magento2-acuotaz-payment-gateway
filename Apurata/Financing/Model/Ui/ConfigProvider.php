@@ -26,6 +26,7 @@ class ConfigProvider implements ConfigProviderInterface
                     'apurataClientId' => $this->configReader->getClientId(),
                     'financingIntentUrl' => $this->urlHelper->getUrl(ConfigData::FINANCING_INTENT_PATH),
                     'financingAddOnUrl' => $this->urlHelper->getUrl(ConfigData::FINANCING_ADD_ON_PATH),
+                    'financingInfoStepsUrl' => $this->urlHelper->getUrl(ConfigData::FINANCING_INFO_STEPS_PATH),
                     'financingCreationUrl' => ConfigData::APURATA_DOMAIN . ConfigData::APURATA_CREATE_ORDER_URL
                 ],
             ]
